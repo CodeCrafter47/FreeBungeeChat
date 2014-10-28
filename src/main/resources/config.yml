@@ -15,4 +15,5 @@ privateMessageReceive: '&b[%player% -> me][/w %player% ] &f*> %message%'
 
 # whether to treat all chat as global chat
 # if this is set to false use /g for global chat
+# IF YOU DON'T KNOW WHAT THIS DOES DON'T CHANGE IT
 alwaysGlobalChat: true
