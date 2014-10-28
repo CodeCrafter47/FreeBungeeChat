@@ -141,10 +141,41 @@ public class FreeBungeeChat extends Plugin implements Listener{
             }
 
         });
+
+        if(!config.getBoolean("alwaysGlobalChat", true)) {
+            super.getProxy().getPluginManager().registerCommand(this, new Command(
+                    "global", null, "g") {
+
+                @Override
+                public void execute(CommandSender cs, String[] args) {
+                    if(!(cs instanceof ProxiedPlayer)){
+                        cs.sendMessage("Only players can do this");
+                        return;
+                    }
+
+                    String message = "";
+                    for (String arg : args) {
+                        message = message + arg + " ";
+                    }
+
+                    // replace variables
+                    String text = config.getString("chatFormat").replaceAll("%player%",
+                            ((ProxiedPlayer) cs).getDisplayName());
+                    text = text.replaceAll("%message%", message);
+
+                    // broadcast message
+                    getProxy().broadcast(ChatUtil.parseString(text));
+                }
+            });
+        }
     }
 
     @EventHandler
     public void onChat(ChatEvent event) {
+
+        // is this global chat?
+        if(!config.getBoolean("alwaysGlobalChat", true))return;
+
         String message = event.getMessage();
 
         // ignore commands

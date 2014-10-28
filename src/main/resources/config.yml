@@ -12,3 +12,7 @@ privateMessageSend: '&b[You -> %target%][/w %target% ]&f *> %message%'
 
 # you can use %player% and %target%
 privateMessageReceive: '&b[%player% -> me][/w %player% ] &f*> %message%'
+
+# whether to treat all chat as global chat
+# if this is set to false use /g for global chat
+alwaysGlobalChat: true
