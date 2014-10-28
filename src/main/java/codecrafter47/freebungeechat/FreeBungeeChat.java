@@ -21,6 +21,7 @@ import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ChatEvent;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
+import net.md_5.bungee.api.event.TabCompleteEvent;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -219,6 +220,21 @@ public class FreeBungeeChat extends Plugin implements Listener{
 
         if (!file.exists()) {
             Files.copy(getResourceAsStream(name), file.toPath());
+        }
+    }
+
+    @EventHandler
+    public void onTabComplete(TabCompleteEvent event){
+        String commandLine = event.getCursor();
+        if(commandLine.startsWith("/tell") || commandLine.startsWith("/message") || commandLine.startsWith("/w") || commandLine.startsWith("/whisper") || commandLine.startsWith("/msg")){
+            event.getSuggestions().clear();
+            String[] split = commandLine.split(" ");
+            String begin = split[split.length - 1];
+            for(ProxiedPlayer player: getProxy().getPlayers()){
+                if(player.getName().contains(begin) || player.getDisplayName().contains(begin)){
+                    event.getSuggestions().add(player.getName());
+                }
+            }
         }
     }
 }
