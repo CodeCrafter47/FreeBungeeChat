@@ -1,0 +1,14 @@
+# This is the Config File of FreeBungeeChat
+# read readme.md for more information
+
+# you can use %player%
+chatFormat: '&b[%player%][/w %player% ] &f> %message%'
+
+# you can use %target%
+unknownTarget: '&c%target% is not on the server'
+
+# you can use %player% and %target%
+privateMessageSend: '&b[You -> %target%][/w %target% ]&f *> %message%'
+
+# you can use %player% and %target%
+privateMessageReceive: '&b[%player% -> me][/w %player% ] &f*> %message%'
