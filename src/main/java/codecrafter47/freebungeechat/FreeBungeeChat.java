@@ -29,6 +29,7 @@ import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
 import net.md_5.bungee.event.EventHandler;
+import net.md_5.bungee.event.EventPriority;
 
 import java.io.File;
 import java.io.IOException;
@@ -171,8 +172,10 @@ public class FreeBungeeChat extends Plugin implements Listener{
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onChat(ChatEvent event) {
+        // ignore canceled chat
+        if(event.isCancelled())return;
 
         // is this global chat?
         if(!config.getBoolean("alwaysGlobalChat", true))return;
