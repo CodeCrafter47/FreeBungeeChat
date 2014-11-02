@@ -17,3 +17,6 @@ privateMessageReceive: '&b[%player% -> me][/w %player% ] &f*> %message%'
 # if this is set to false use /g for global chat
 # IF YOU DON'T KNOW WHAT THIS DOES DON'T CHANGE IT
 alwaysGlobalChat: true
+
+#whether to underline everything that is clickable or has a hover effect
+underlineLinks: true

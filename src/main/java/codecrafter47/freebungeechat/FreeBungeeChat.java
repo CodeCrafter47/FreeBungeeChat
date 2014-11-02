@@ -39,10 +39,12 @@ import java.util.Map;
 
 public class FreeBungeeChat extends Plugin implements Listener{
     private final Map<String, String> replyTarget = new HashMap<>();
-    private Configuration config;
+    Configuration config;
+    public static FreeBungeeChat instance;
 
     @Override
     public void onEnable() {
+        instance = this;
 
         saveResource("config.yml");
         saveResource("LICENSE");

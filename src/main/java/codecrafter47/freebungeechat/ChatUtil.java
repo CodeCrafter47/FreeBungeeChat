@@ -71,7 +71,8 @@ public class ChatUtil {
             if (matcher.group("text") != null) {
                 String url = matcher.group("url");
                 String hover = matcher.group("tooltip");
-                cb = cb.underlined(true);
+                if (FreeBungeeChat.instance.config.getBoolean("underlineLinks", true))
+                    cb = cb.underlined(true);
                 if (url != null) {
                     ClickEvent evt;
                     if (url.charAt(0) == '/') {
@@ -90,12 +91,14 @@ public class ChatUtil {
                 cb = cb.append("");
                 cb = cb.event((ClickEvent) null);
                 cb = cb.event((HoverEvent) null);
-                cb = cb.underlined(false);
+                if (FreeBungeeChat.instance.config.getBoolean("underlineLinks", true))
+                    cb = cb.underlined(false);
             }
             if (matcher.group("cmdtext") != null) {
                 String url = matcher.group("cmdurl");
                 String hover = matcher.group("cmdtooltip");
-                cb = cb.underlined(true);
+                if (FreeBungeeChat.instance.config.getBoolean("underlineLinks", true))
+                    cb = cb.underlined(true);
                 if (url != null) {
                     ClickEvent evt;
                     if (url.charAt(0) == '/') {
@@ -115,17 +118,20 @@ public class ChatUtil {
                 cb = cb.append("");
                 cb = cb.event((ClickEvent) null);
                 cb = cb.event((HoverEvent) null);
-                cb = cb.underlined(false);
+                if (FreeBungeeChat.instance.config.getBoolean("underlineLinks", true))
+                    cb = cb.underlined(false);
             }
             if (matcher.group("directlink") != null) {
-                cb = cb.underlined(true);
+                if (FreeBungeeChat.instance.config.getBoolean("underlineLinks", true))
+                    cb = cb.underlined(true);
                 cb = cb.event(new ClickEvent(ClickEvent.Action.OPEN_URL,
                         makeLink(matcher.group("directlink"))));
                 cb = cb.append(matcher.group("directlink"));
                 cb = cb.append("");
                 cb = cb.event((ClickEvent) null);
                 cb = cb.event((HoverEvent) null);
-                cb = cb.underlined(false);
+                if (FreeBungeeChat.instance.config.getBoolean("underlineLinks", true))
+                    cb = cb.underlined(false);
 
             }
         }
