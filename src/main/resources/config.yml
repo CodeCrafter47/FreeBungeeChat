@@ -7,16 +7,29 @@ chatFormat: '&b[%player%][/w %player% ] &f> %message%'
 # you can use %target%
 unknownTarget: '&c%target% is not on the server'
 
+# you can use %target%, will be send when trying to message an player who ignores you
+ignored: '&c%target% doesn't like you'
+
+ignoreSuccess: '&7You ignored %target%'
+ignoreUnignore: '&7You no longer ignore %target%'
+
 # you can use %player% and %target%
 privateMessageSend: '&b[You -> %target%][/w %target% ]&f *> %message%'
 
 # you can use %player% and %target%
 privateMessageReceive: '&b[%player% -> me][/w %player% ] &f*> %message%'
 
+# whether to underline everything that is clickable or has a hover effect
+underlineLinks: true
+
+###########################################################
+# ONLY EDIT BELOW SETTINGS IF YOU KNOW WHAT YOU ARE DOING #
+###########################################################
+
 # whether to treat all chat as global chat
 # if this is set to false use /g for global chat
 # IF YOU DON'T KNOW WHAT THIS DOES DON'T CHANGE IT
 alwaysGlobalChat: true
 
-#whether to underline everything that is clickable or has a hover effect
-underlineLinks: true
+# should be self-explaining
+enableIgnoreCommand: true

@@ -18,6 +18,7 @@ package codecrafter47.freebungeechat;
 
 import lombok.SneakyThrows;
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ChatEvent;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
@@ -34,11 +35,14 @@ import net.md_5.bungee.event.EventPriority;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class FreeBungeeChat extends Plugin implements Listener{
     private final Map<String, String> replyTarget = new HashMap<>();
+	private final Map<String, List<String>> ignoredPlayers = new HashMap<>();
     Configuration config;
     public static FreeBungeeChat instance;
 
@@ -81,6 +85,15 @@ public class FreeBungeeChat extends Plugin implements Listener{
                     text = text + args[i] + " ";
                 }
 
+				// check ignored
+				if(ignoredPlayers.get(target.getName()) != null && ignoredPlayers.get(target.getName()).contains(player.getName())){
+					text = config.getString("ignored").replaceAll(
+							"%target%",
+							args[0]);
+					player.sendMessage(ChatUtil.parseString(text));
+					return;
+				}
+
                 player.sendMessage(ChatUtil.parseString(
                         config.getString("privateMessageSend").replaceAll(
                                 "%target%", target.
@@ -119,6 +132,15 @@ public class FreeBungeeChat extends Plugin implements Listener{
                     player.sendMessage(ChatUtil.parseString(text));
                     return;
                 }
+
+				// check ignored
+				if(ignoredPlayers.get(target.getName()) != null && ignoredPlayers.get(target.getName()).contains(player.getName())){
+					String text = config.getString("ignored").replaceAll(
+							"%target%",
+							args[0]);
+					player.sendMessage(ChatUtil.parseString(text));
+					return;
+				}
 
                 String text = "";
                 for (String arg : args) {
@@ -168,16 +190,69 @@ public class FreeBungeeChat extends Plugin implements Listener{
                     text = text.replaceAll("%message%", message);
 
                     // broadcast message
-                    getProxy().broadcast(ChatUtil.parseString(text));
+                    BaseComponent[] msg = ChatUtil.parseString(text);
+					for(ProxiedPlayer target: getProxy().getPlayers()){
+						if(ignoredPlayers.get(target.getName()) != null && ignoredPlayers.get(target.getName()).contains(cs.getName()))continue;
+						target.sendMessage(msg);
+					}
                 }
             });
         }
+
+		if(config.getBoolean("enableIgnoreCommand", true)) {
+			super.getProxy().getPluginManager().registerCommand(this, new Command(
+					"ignore", null) {
+
+				@Override
+				public void execute(CommandSender cs, String[] args) {
+					if(!(cs instanceof ProxiedPlayer)){
+						cs.sendMessage("Only players can do this");
+						return;
+					}
+
+					if(args.length != 1){
+						cs.sendMessage("/ignore <player>");
+					}
+
+					ProxiedPlayer toIgnore = getProxy().getPlayer(args[0]);
+
+					if(toIgnore == null){
+						String text = config.getString("unknownTarget").replaceAll(
+								"%target%",
+								args[0]);
+						cs.sendMessage(ChatUtil.parseString(text));
+						return;
+					}
+
+					// add player to ignore list
+					List<String> ignoreList = ignoredPlayers.get(cs.getName());
+					if(ignoreList == null) ignoreList = new ArrayList<>(1);
+					if(!ignoreList.contains(toIgnore.getName())) {
+						ignoreList.add(toIgnore.getName());
+						String text = config.getString("ignoreSuccess").replaceAll(
+								"%target%",
+								args[0]);
+						cs.sendMessage(ChatUtil.parseString(text));
+					}
+					else {
+						ignoreList.remove(toIgnore.getName());
+						String text = config.getString("ignoreUnignore").replaceAll(
+								"%target%",
+								args[0]);
+						cs.sendMessage(ChatUtil.parseString(text));
+					}
+					ignoredPlayers.put(cs.getName(), ignoreList);
+				}
+			});
+		}
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onChat(ChatEvent event) {
         // ignore canceled chat
         if(event.isCancelled())return;
+
+		if(!(event.getSender() instanceof ProxiedPlayer))return;
 
         // is this global chat?
         if(!config.getBoolean("alwaysGlobalChat", true))return;
@@ -194,8 +269,12 @@ public class FreeBungeeChat extends Plugin implements Listener{
                 ((ProxiedPlayer) event.getSender()).getDisplayName());
         text = text.replaceAll("%message%", message);
 
-        // broadcast message
-        getProxy().broadcast(ChatUtil.parseString(text));
+		// broadcast message
+		BaseComponent[] msg = ChatUtil.parseString(text);
+		for(ProxiedPlayer target: getProxy().getPlayers()){
+			if(ignoredPlayers.get(target.getName()) != null && ignoredPlayers.get(target.getName()).contains(((ProxiedPlayer) event.getSender()).getName()))continue;
+			target.sendMessage(msg);
+		}
 
         // cancel event
         event.setCancelled(true);
@@ -205,6 +284,7 @@ public class FreeBungeeChat extends Plugin implements Listener{
     public void onDisconnect(PlayerDisconnectEvent event){
         String name = event.getPlayer().getName();
         if(replyTarget.containsKey(name))replyTarget.remove(name);
+		if(ignoredPlayers.containsKey(name))ignoredPlayers.remove(name);
     }
 
     private ProxiedPlayer getReplyTarget(ProxiedPlayer player) {
@@ -212,8 +292,7 @@ public class FreeBungeeChat extends Plugin implements Listener{
         if (t == null) {
             return player;
         }
-        ProxiedPlayer target = getProxy().getPlayer(t);
-        return target;
+		return getProxy().getPlayer(t);
     }
 
     @SneakyThrows

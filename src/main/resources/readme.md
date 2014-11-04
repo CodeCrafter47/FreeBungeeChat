@@ -13,15 +13,16 @@ Commands
 
 `/tell`, `/message`, `/w`, `/whisper`, `/msg` - send a private message
 `/r` - reply to a previous message
+`/ignore` - don't receive messages from a specific player
 
 Text Format
 ===========
 
 Color codes work with `&` or `§`.
 italic text using `*` or `_`: `this is *italic* and this is _italic_ too`
-bold text using `**` or `__`: `this is **bold** and this is _bold__ too`
+bold text using `**` or `__`: `this is **bold** and this is __bold__ too`
 links: `<spigotmc.org>`
-links with user text: `click [here](spigotmc.org)`
+links with custom text: `click [here](spigotmc.org)`
 text with tooltip: `[text]{this appears if you hover over the text} ...`
 link with tooltip: `click [here](spigotmc.org){for the best plugins :D}`
 execute command: `> [DAY](/time set 6000) | [NIGHT](/time set 18000)`
