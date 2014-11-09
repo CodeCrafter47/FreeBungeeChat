@@ -46,6 +46,8 @@ public class FreeBungeeChat extends Plugin implements Listener{
     Configuration config;
     public static FreeBungeeChat instance;
 
+	List<String> excludedServers = new ArrayList<>();
+
     @Override
     public void onEnable() {
         instance = this;
@@ -59,6 +61,10 @@ public class FreeBungeeChat extends Plugin implements Listener{
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+		if(config.getStringList("excludeServers") != null){
+			excludedServers = config.getStringList("excludeServers");
+		}
 
         super.getProxy().getPluginManager().registerListener(this, this);
 
@@ -193,7 +199,7 @@ public class FreeBungeeChat extends Plugin implements Listener{
                     BaseComponent[] msg = ChatUtil.parseString(text);
 					for(ProxiedPlayer target: getProxy().getPlayers()){
 						if(ignoredPlayers.get(target.getName()) != null && ignoredPlayers.get(target.getName()).contains(cs.getName()))continue;
-						target.sendMessage(msg);
+						if(!excludedServers.contains(target.getServer().getInfo().getName()))target.sendMessage(msg);
 					}
                 }
             });
@@ -257,6 +263,8 @@ public class FreeBungeeChat extends Plugin implements Listener{
         // is this global chat?
         if(!config.getBoolean("alwaysGlobalChat", true))return;
 
+		if(excludedServers.contains(((ProxiedPlayer)event.getSender()).getServer().getInfo().getName()))return;
+
         String message = event.getMessage();
 
         // ignore commands
@@ -273,7 +281,7 @@ public class FreeBungeeChat extends Plugin implements Listener{
 		BaseComponent[] msg = ChatUtil.parseString(text);
 		for(ProxiedPlayer target: getProxy().getPlayers()){
 			if(ignoredPlayers.get(target.getName()) != null && ignoredPlayers.get(target.getName()).contains(((ProxiedPlayer) event.getSender()).getName()))continue;
-			target.sendMessage(msg);
+			if(!excludedServers.contains(target.getServer().getInfo().getName()))target.sendMessage(msg);
 		}
 
         // cancel event

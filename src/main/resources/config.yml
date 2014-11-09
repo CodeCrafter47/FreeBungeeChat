@@ -8,7 +8,7 @@ chatFormat: '&b[%player%][/w %player% ] &f> %message%'
 unknownTarget: '&c%target% is not on the server'
 
 # you can use %target%, will be send when trying to message an player who ignores you
-ignored: '&c%target% doesn't like you'
+ignored: "&c%target% doesn't like you"
 
 ignoreSuccess: '&7You ignored %target%'
 ignoreUnignore: '&7You no longer ignore %target%'
@@ -33,3 +33,8 @@ alwaysGlobalChat: true
 
 # should be self-explaining
 enableIgnoreCommand: true
+
+# exclude servers from global chat, players on these servers will not be able to send or receive global chat
+#excludeServers:
+#  - spawn
+#  - survival
