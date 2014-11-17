@@ -40,145 +40,133 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
 /**
- *
  * @author Florian Stober
  */
 public class BukkitBridge extends JavaPlugin implements Listener {
 
-    GeneralInformationUpdateTask generalInformationUpdateTask = null;
+	GeneralInformationUpdateTask generalInformationUpdateTask = null;
 
-    Map<Player, PlayerInformationUpdateTask> playerInformationUpdaters = new ConcurrentHashMap<>();
+	Map<Player, PlayerInformationUpdateTask> playerInformationUpdaters = new ConcurrentHashMap<>();
 
-    Collection<GeneralInformationProvider> generalInformationProviders = new HashSet<>();
+	Collection<GeneralInformationProvider> generalInformationProviders = new HashSet<>();
 
-    Collection<PlayerInformationProvider> playerInformationProviders = new HashSet<>();
+	Collection<PlayerInformationProvider> playerInformationProviders = new HashSet<>();
 
-    Map<Plugin, Collection<GeneralInformationProvider>> pluginsGeneralInformationProviders = new HashMap<>();
+	Map<Plugin, Collection<GeneralInformationProvider>> pluginsGeneralInformationProviders = new HashMap<>();
 
-    Map<Plugin, Collection<PlayerInformationProvider>> pluginsPlayerInformationProviders = new HashMap<>();
+	Map<Plugin, Collection<PlayerInformationProvider>> pluginsPlayerInformationProviders = new HashMap<>();
 
-    private boolean useAsyncThreads = true;
+	@Override
+	public void onEnable() {
 
-    @Override
-    public void onEnable() {
-        super.saveResource("config.yml", false);
+		getServer().getMessenger().registerOutgoingPluginChannel(this,
+				Constants.channel);
+		getServer().getMessenger().registerIncomingPluginChannel(this,
+				Constants.channel, new PluginMessageListener() {
 
-        useAsyncThreads = super.getConfig().getBoolean("useAsyncThreads",
-                useAsyncThreads);
+					@Override
+					public void onPluginMessageReceived(String string,
+							Player player, byte[] bytes) {
+						try {
+							DataInputStream in = new DataInputStream(
+									new ByteArrayInputStream(bytes));
 
-        getServer().getMessenger().registerOutgoingPluginChannel(this,
-                Constants.channel);
-        getServer().getMessenger().registerIncomingPluginChannel(this,
-                Constants.channel, new PluginMessageListener() {
+							String subchannel = in.readUTF();
+							if (subchannel.equals(Constants.subchannel_init)) {
+								reinitialize();
+							}
+							if (subchannel.equals(
+									Constants.subchannel_initplayer)) {
+								addPlayer(player);
+							}
+						}
+						catch (IOException ex) {
+							reinitialize();
+						}
+					}
+				});
+		getServer().getPluginManager().registerEvents(this, this);
 
-                    @Override
-                    public void onPluginMessageReceived(String string,
-                            Player player, byte[] bytes) {
-                        try {
-                            DataInputStream in = new DataInputStream(
-                                    new ByteArrayInputStream(bytes));
+		// register own informationhooks
 
-                            String subchannel = in.readUTF();
-                            if (subchannel.equals(Constants.subchannel_init)) {
-                                reinitialize();
-                            }
-                            if (subchannel.equals(
-                                    Constants.subchannel_initplayer)) {
-                                addPlayer(player);
-                            }
-                        } catch (IOException ex) {
-                            reinitialize();
-                        }
-                    }
-                });
-        getServer().getPluginManager().registerEvents(this, this);
+		Plugin vault = getServer().getPluginManager().getPlugin("Vault");
+		if (vault != null) {
+			getLogger().info("hooked Vault");
+			this.registerPlayerInformationProvider(vault, new VaultHook(this));
+		}
 
-        // register own informationhooks
+		BukkitHook bukkitHook = new BukkitHook(this);
+		this.registerInformationProvider(this, bukkitHook);
+		this.registerPlayerInformationProvider(this, bukkitHook);
 
-        Plugin vault = getServer().getPluginManager().getPlugin("Vault");
-        if (vault != null) {
-            getLogger().info("hooked Vault");
-            this.registerPlayerInformationProvider(vault, new VaultHook(this));
-        }
+		// start generalInformation update task
+		this.generalInformationUpdateTask = new GeneralInformationUpdateTask(
+				this);
+		this.generalInformationUpdateTask.
+				runTaskTimerAsynchronously(this, 0,
+						Constants.updateDelay);
 
-        BukkitHook bukkitHook = new BukkitHook(this);
-        this.registerInformationProvider(this, bukkitHook);
-        this.registerPlayerInformationProvider(this, bukkitHook);
+		// add all players yet on the server
+		for (Player player : getServer().getOnlinePlayers()) {
+			addPlayer(player);
+		}
 
-        // start generalInformation update task
-        this.generalInformationUpdateTask = new GeneralInformationUpdateTask(
-                this);
-        if (useAsyncThreads) {
-            this.generalInformationUpdateTask.
-                    runTaskTimerAsynchronously(this, 0,
-                            Constants.updateDelay);
-        } else {
-            this.generalInformationUpdateTask.runTaskTimer(this, 0,
-                    Constants.updateDelay);
-        }
+		// start autoreinitialize every 5 minutes
+		new BukkitRunnable() {
 
-        // add all players yet on the server
-        for (Player player : getServer().getOnlinePlayers()) {
-            addPlayer(player);
-        }
+			@Override
+			public void run() {
+				reinitialize();
+			}
 
-        // start autoreinitialize every 5 minutes
-        new BukkitRunnable() {
+		}.runTaskTimer(this, Constants.completeUpdateDelay,
+				Constants.completeUpdateDelay);
+	}
 
-            @Override
-            public void run() {
-                reinitialize();
-            }
+	private void reinitialize() {
+		BukkitBridge.this.generalInformationUpdateTask.setInitialized(false);
+		for (PlayerInformationUpdateTask task
+				: BukkitBridge.this.playerInformationUpdaters.values()) {
+			task.setInitialized(false);
+		}
+	}
 
-        }.runTaskTimer(this, Constants.completeUpdateDelay,
-                Constants.completeUpdateDelay);
-    }
+	private void addPlayer(Player player) {
+		if (playerInformationUpdaters.containsKey(player)) {
+			try {
+				playerInformationUpdaters.get(player).cancel();
+			}
+			catch (Exception ex) {
+				// TODO do something
+			}
+			finally {
+				playerInformationUpdaters.remove(player);
+			}
+		}
+		PlayerInformationUpdateTask playerInformationUpdateTask = new PlayerInformationUpdateTask(
+				this, player);
+		playerInformationUpdateTask.runTaskTimerAsynchronously(this, 0,
+				Constants.updateDelay);
+		playerInformationUpdaters.put(player, playerInformationUpdateTask);
+	}
 
-    private void reinitialize() {
-        BukkitBridge.this.generalInformationUpdateTask.setInitialized(false);
-        for (PlayerInformationUpdateTask task
-                : BukkitBridge.this.playerInformationUpdaters.values()) {
-            task.setInitialized(false);
-        }
-    }
-
-    private void addPlayer(Player player) {
-        if (playerInformationUpdaters.containsKey(player)) {
-            try {
-                playerInformationUpdaters.get(player).cancel();
-            } catch (Exception ex) {
-                // TODO do something
-            } finally {
-                playerInformationUpdaters.remove(player);
-            }
-        }
-        PlayerInformationUpdateTask playerInformationUpdateTask = new PlayerInformationUpdateTask(
-                this, player);
-        if (this.useAsyncThreads) {
-            playerInformationUpdateTask.runTaskTimerAsynchronously(this, 0,
-                    Constants.updateDelay);
-        } else {
-            playerInformationUpdateTask.runTaskTimer(this, 0,
-                    Constants.updateDelay);
-        }
-        playerInformationUpdaters.put(player, playerInformationUpdateTask);
-    }
-
-    @EventHandler
-    public void onPlayerLeave(PlayerQuitEvent event) {
-        Player player = event.getPlayer();
-        if (playerInformationUpdaters.containsKey(player)) {
-            try {
-                playerInformationUpdaters.get(player).cancel();
-            } catch (Exception ex) {
-                // TODO do something
-            } finally {
-                playerInformationUpdaters.remove(player);
-            }
-        }
-    }
+	@EventHandler
+	public void onPlayerLeave(PlayerQuitEvent event) {
+		Player player = event.getPlayer();
+		if (playerInformationUpdaters.containsKey(player)) {
+			try {
+				playerInformationUpdaters.get(player).cancel();
+			}
+			catch (Exception ex) {
+				// TODO do something
+			}
+			finally {
+				playerInformationUpdaters.remove(player);
+			}
+		}
+	}
 /*
-    @EventHandler
+	@EventHandler
     public void onPluginDisable(PluginDisableEvent event) {
         Plugin plugin = event.getPlugin();
 
@@ -197,56 +185,57 @@ public class BukkitBridge extends JavaPlugin implements Listener {
         reinitialize();
     }*/
 
-    void registerInformationProvider(Plugin pl,
-            GeneralInformationProvider ip) {
-        this.generalInformationProviders.add(ip);
-        if (!this.pluginsGeneralInformationProviders.containsKey(pl)) {
-            this.pluginsGeneralInformationProviders.put(pl,
-                    new HashSet<GeneralInformationProvider>());
-        }
-        this.pluginsGeneralInformationProviders.get(pl).add(ip);
-    }
+	void registerInformationProvider(Plugin pl,
+			GeneralInformationProvider ip) {
+		this.generalInformationProviders.add(ip);
+		if (!this.pluginsGeneralInformationProviders.containsKey(pl)) {
+			this.pluginsGeneralInformationProviders.put(pl,
+					new HashSet<GeneralInformationProvider>());
+		}
+		this.pluginsGeneralInformationProviders.get(pl).add(ip);
+	}
 
-    void registerPlayerInformationProvider(Plugin pl,
-            PlayerInformationProvider ip) {
-        this.playerInformationProviders.add(ip);
-        if (!this.pluginsPlayerInformationProviders.containsKey(pl)) {
-            this.pluginsPlayerInformationProviders.put(pl,
-                    new HashSet<PlayerInformationProvider>());
-        }
-        this.pluginsPlayerInformationProviders.get(pl).add(ip);
-    }
+	void registerPlayerInformationProvider(Plugin pl,
+			PlayerInformationProvider ip) {
+		this.playerInformationProviders.add(ip);
+		if (!this.pluginsPlayerInformationProviders.containsKey(pl)) {
+			this.pluginsPlayerInformationProviders.put(pl,
+					new HashSet<PlayerInformationProvider>());
+		}
+		this.pluginsPlayerInformationProviders.get(pl).add(ip);
+	}
 
-    protected void sendInformation(String subchannel,
-            Map<String, Object> information, Player player) {
-        try {
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            DataOutputStream out = new DataOutputStream(os);
-            out.writeUTF(subchannel);
-            out.writeInt(information.size());
-            for (Entry<String, Object> entry : information.entrySet()) {
-                out.writeUTF(entry.getKey());
-                out.writeUTF(entry.getValue().toString());
-            }
-            player.sendPluginMessage(this, Constants.channel, os.toByteArray());
-        } catch (IOException ex) {
-            getLogger().log(Level.SEVERE, null, ex);
-        }
-    }
+	protected void sendInformation(String subchannel,
+			Map<String, Object> information, Player player) {
+		try {
+			ByteArrayOutputStream os = new ByteArrayOutputStream();
+			DataOutputStream out = new DataOutputStream(os);
+			out.writeUTF(subchannel);
+			out.writeInt(information.size());
+			for (Entry<String, Object> entry : information.entrySet()) {
+				out.writeUTF(entry.getKey());
+				out.writeUTF(entry.getValue().toString());
+			}
+			player.sendPluginMessage(this, Constants.channel, os.toByteArray());
+		}
+		catch (IOException ex) {
+			getLogger().log(Level.SEVERE, null, ex);
+		}
+	}
 
-    protected Collection<GeneralInformationProvider> getGeneralInformationProviders() {
-        return this.generalInformationProviders;
-    }
+	protected Collection<GeneralInformationProvider> getGeneralInformationProviders() {
+		return this.generalInformationProviders;
+	}
 
-    protected Collection<PlayerInformationProvider> getPlayerInformationProviders() {
-        return this.playerInformationProviders;
-    }
+	protected Collection<PlayerInformationProvider> getPlayerInformationProviders() {
+		return this.playerInformationProviders;
+	}
 
-    public void reportError(Throwable th) {
-        getLogger().log(Level.WARNING,
-                ChatColor.RED + "An internal error occured! Please send the "
-                + "following stacktrace to the developer in order to help"
-                + " resolving the problem",
-                th);
-    }
+	public void reportError(Throwable th) {
+		getLogger().log(Level.WARNING,
+				ChatColor.RED + "An internal error occured! Please send the "
+						+ "following stacktrace to the developer in order to help"
+						+ " resolving the problem",
+				th);
+	}
 }
