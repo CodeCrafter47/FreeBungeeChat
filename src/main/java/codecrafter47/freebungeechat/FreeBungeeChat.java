@@ -353,6 +353,7 @@ public class FreeBungeeChat extends Plugin implements Listener{
 		text = text.replace("%"+prefix+"health%", bukkitBridge.getPlayerInformation(player, "health"));
 		text = text.replace("%"+prefix+"level%", bukkitBridge.getPlayerInformation(player, "level"));
 		text = text.replace("%"+prefix+"server%", bukkitBridge.getPlayerInformation(player, "server"));
+		text = text.replace("%newline%", "\n");
 		return text;
 	}
 }
