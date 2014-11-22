@@ -25,7 +25,7 @@ underlineLinks: true
 # you can add custom regular expressions here
 regex:
 # allows tagging players with @player
-    - search: "@(?<name>.{1,16})"
+    - search: "@(?<name>[^ ]{1,16})"
       replace: "[@${name}][/w ${name}]"
 # shows link target in tooltip for security reasons
     - search: '(?:(?<!\\)\[(?<text>[^\]]*?)(?<!\\)\](?=[({])(?:\((?<url>.*?)(?<!\\)\))(?:\{(?<tooltip>.*?)(?<!\\)\})?)'
