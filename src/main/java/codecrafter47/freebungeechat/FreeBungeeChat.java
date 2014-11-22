@@ -350,19 +350,19 @@ public class FreeBungeeChat extends Plugin implements Listener{
     }
 
 	private String replaceVariables(ProxiedPlayer player, String text, String prefix){
-		text = text.replace("%"+prefix+"group%", ChatUtil.escapeSpecialChars(bukkitBridge.getPlayerInformation(player, "group")));
-		text = text.replace("%"+prefix+"prefix%", ChatUtil.escapeSpecialChars(bukkitBridge.getPlayerInformation(player, "prefix")));
-		text = text.replace("%"+prefix+"suffix%", ChatUtil.escapeSpecialChars(bukkitBridge.getPlayerInformation(player, "suffix")));
-		text = text.replace("%"+prefix+"balance%", ChatUtil.escapeSpecialChars(bukkitBridge.getPlayerInformation(player, "balance")));
-		text = text.replace("%"+prefix+"currency%", ChatUtil.escapeSpecialChars(bukkitBridge.getPlayerInformation(player, "currency")));
-		text = text.replace("%"+prefix+"currencyPl%", ChatUtil.escapeSpecialChars(bukkitBridge.getPlayerInformation(player, "currencyPl")));
-		text = text.replace("%"+prefix+"tabName%", ChatUtil.escapeSpecialChars(bukkitBridge.getPlayerInformation(player, "tabName")));
-		text = text.replace("%"+prefix+"displayName%", ChatUtil.escapeSpecialChars(bukkitBridge.getPlayerInformation(player, "displayName")));
-		text = text.replace("%"+prefix+"world%", ChatUtil.escapeSpecialChars(bukkitBridge.getPlayerInformation(player, "world")));
-		text = text.replace("%"+prefix+"health%",ChatUtil.escapeSpecialChars( bukkitBridge.getPlayerInformation(player, "health")));
-		text = text.replace("%"+prefix+"level%", ChatUtil.escapeSpecialChars(bukkitBridge.getPlayerInformation(player, "level")));
-		text = text.replace("%"+prefix+"server%", ChatUtil.escapeSpecialChars(bukkitBridge.getPlayerInformation(player, "server")));
-		text = text.replace("%newline%", "\n");
+		text = text.replaceAll("%"+prefix+"group%", Matcher.quoteReplacement(bukkitBridge.getPlayerInformation(player, "group")));
+		text = text.replaceAll("%"+prefix+"prefix%", Matcher.quoteReplacement(bukkitBridge.getPlayerInformation(player, "prefix")));
+		text = text.replaceAll("%"+prefix+"suffix%", Matcher.quoteReplacement(bukkitBridge.getPlayerInformation(player, "suffix")));
+		text = text.replaceAll("%"+prefix+"balance%", Matcher.quoteReplacement(bukkitBridge.getPlayerInformation(player, "balance")));
+		text = text.replaceAll("%"+prefix+"currency%", Matcher.quoteReplacement(bukkitBridge.getPlayerInformation(player, "currency")));
+		text = text.replaceAll("%"+prefix+"currencyPl%", Matcher.quoteReplacement(bukkitBridge.getPlayerInformation(player, "currencyPl")));
+		text = text.replaceAll("%"+prefix+"tabName%", Matcher.quoteReplacement(bukkitBridge.getPlayerInformation(player, "tabName")));
+		text = text.replaceAll("%"+prefix+"displayName%", Matcher.quoteReplacement(bukkitBridge.getPlayerInformation(player, "displayName")));
+		text = text.replaceAll("%"+prefix+"world%", Matcher.quoteReplacement(bukkitBridge.getPlayerInformation(player, "world")));
+		text = text.replaceAll("%"+prefix+"health%", Matcher.quoteReplacement(bukkitBridge.getPlayerInformation(player, "health")));
+		text = text.replaceAll("%"+prefix+"level%", Matcher.quoteReplacement(bukkitBridge.getPlayerInformation(player, "level")));
+		text = text.replaceAll("%"+prefix+"server%", Matcher.quoteReplacement(bukkitBridge.getPlayerInformation(player, "server")));
+		text = text.replaceAll("%newline%", "\n");
 		return text;
 	}
 
