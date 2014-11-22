@@ -109,6 +109,8 @@ public class FreeBungeeChat extends Plugin implements Listener{
 					return;
 				}
 
+				text = replaceRegex(text);
+
                 player.sendMessage(ChatUtil.parseString(
                         config.getString("privateMessageSend").replaceAll(
                                 "%target%", ChatUtil.escapeSpecialChars(target.
@@ -162,6 +164,8 @@ public class FreeBungeeChat extends Plugin implements Listener{
                     text = text + arg + " ";
                 }
 
+				text = replaceRegex(text);
+
                 player.sendMessage(ChatUtil.parseString(
 						replaceVariables(target, replaceVariables(player, config.getString("privateMessageSend").replaceAll(
                                 "%target%", ChatUtil.escapeSpecialChars(target.
@@ -198,6 +202,8 @@ public class FreeBungeeChat extends Plugin implements Listener{
                     for (String arg : args) {
                         message = message + arg + " ";
                     }
+
+					message = replaceRegex(message);
 
                     // replace variables
                     String text = config.getString("chatFormat").replaceAll("%player%",
@@ -282,6 +288,8 @@ public class FreeBungeeChat extends Plugin implements Listener{
             return;
         }
 
+		message = replaceRegex(message);
+
         // replace variables
         String text = config.getString("chatFormat").replaceAll("%player%",
 				ChatUtil.escapeSpecialChars(((ProxiedPlayer) event.getSender()).getDisplayName()));
@@ -356,5 +364,15 @@ public class FreeBungeeChat extends Plugin implements Listener{
 		text = text.replace("%"+prefix+"server%", ChatUtil.escapeSpecialChars(bukkitBridge.getPlayerInformation(player, "server")));
 		text = text.replace("%newline%", "\n");
 		return text;
+	}
+
+	private String replaceRegex(String str){
+		List list = config.getList("regex");
+		if(list == null)return str;
+		for(Object entry: list){
+			Map map = (Map) entry;
+			str = str.replaceAll(String.valueOf(map.get("search")), String.valueOf(map.get("replace")));
+		}
+		return str;
 	}
 }

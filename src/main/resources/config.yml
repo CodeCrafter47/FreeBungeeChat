@@ -22,6 +22,15 @@ privateMessageReceive: '&b[%player% -> me][/w %player% ] &f*> %message%'
 # whether to underline everything that is clickable or has a hover effect
 underlineLinks: true
 
+# you can add custom regular expressions here
+regex:
+# allows tagging players with @player
+    - search: "@(?<name>.{1,16})"
+      replace: "[@${name}][/w ${name}]"
+# shows link target in tooltip for security reasons
+    - search: '(?:(?<!\\)\[(?<text>[^\]]*?)(?<!\\)\](?=[({])(?:\((?<url>.*?)(?<!\\)\))(?:\{(?<tooltip>.*?)(?<!\\)\})?)'
+      replace: "[${text}](${url}){${tooltip}%newline%${url}}"
+
 ###########################################################
 # ONLY EDIT BELOW SETTINGS IF YOU KNOW WHAT YOU ARE DOING #
 ###########################################################
