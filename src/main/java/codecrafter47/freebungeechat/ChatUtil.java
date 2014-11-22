@@ -46,14 +46,13 @@ public class ChatUtil {
     public static ComponentBuilder iparseString(ComponentBuilder cb, String s) {
 
         Matcher matcher = pattern.matcher(s);
-        //int i = 0;
         boolean bold = false;
         boolean italic = false;
 
         while (matcher.find()) {
             StringBuffer sb = new StringBuffer();
             matcher.appendReplacement(sb, "");
-            String str = sb.toString(); // TODO remove escapes
+            String str = sb.toString();
             str = removeEscapes(str);
             cb = cb.append(str);
             cb = cb.append("");
@@ -138,22 +137,18 @@ public class ChatUtil {
 
         StringBuffer sb = new StringBuffer();
         matcher.appendTail(sb);
-        cb = cb.append(sb.toString());
+        cb = cb.append(removeEscapes(sb.toString()));
 
         return cb;
     }
 
     private static String removeEscapes(String str) {
-        Pattern escapePattern = Pattern.compile(
-                "\\\\(?<rep>[\\[\\]()<>*{}§&\\\\])");
-        Matcher matcher = escapePattern.matcher(str);
-        StringBuffer sb = new StringBuffer();
-        while (matcher.find()) {
-            matcher.appendReplacement(sb, matcher.group("rep"));
-        }
-        matcher.appendTail(sb);
-        return sb.toString();
+		return str.replaceAll("\\\\(?<rep>[\\[\\]()<>*{}§&\\\\])", "${rep}");
     }
+
+	public static String escapeSpecialChars(String str) {
+		return str.replaceAll("(?<rep>[\\[\\]()<>*{}§&\\\\])", "\\\\${rep}");
+	}
 
     private static String makeLink(String link) {
         if (!link.matches("http((s)?)://.*")) {
