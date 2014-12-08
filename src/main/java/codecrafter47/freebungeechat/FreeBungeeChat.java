@@ -215,7 +215,7 @@ public class FreeBungeeChat extends Plugin implements Listener{
                     BaseComponent[] msg = ChatUtil.parseString(text);
 					for(ProxiedPlayer target: getProxy().getPlayers()){
 						if(ignoredPlayers.get(target.getName()) != null && ignoredPlayers.get(target.getName()).contains(cs.getName()))continue;
-						if(!excludedServers.contains(target.getServer().getInfo().getName()))target.sendMessage(msg);
+						if(target.getServer() == null || !excludedServers.contains(target.getServer().getInfo().getName()))target.sendMessage(msg);
 					}
                 }
             });
