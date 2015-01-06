@@ -17,6 +17,7 @@
 package codecrafter47.freebungeechat;
 
 import codecrafter47.freebungeechat.bukkitbridge.Constants;
+import com.google.common.base.Charsets;
 import lombok.SneakyThrows;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -34,7 +35,9 @@ import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -61,7 +64,7 @@ public class FreeBungeeChat extends Plugin implements Listener{
         saveResource("readme.md");
 
         try {
-            config = ConfigurationProvider.getProvider(YamlConfiguration.class).load(new File(getDataFolder(), "config.yml"));
+            config = ConfigurationProvider.getProvider(YamlConfiguration.class).load(new InputStreamReader(new FileInputStream(new File(getDataFolder(), "config.yml")), Charsets.UTF_8));
         } catch (IOException e) {
             e.printStackTrace();
         }
