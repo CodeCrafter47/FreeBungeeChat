@@ -31,5 +31,5 @@ Executing commands works similar [command=/tp CodeCrafter47]click here[/command]
 Suggesting commands works with [suggest=/tp ]...[/suggest]
 To create tooltips d [hover=Text magically appears when moving the mouse over]this[/hover].
 
-It is possible to use [nocolor][/nocolor] to prevent the use of legacy color codes in a block; color codes will be removed
-[nobbcode][/nobbcode] will prevent the use of bbcode in a block; bbcode will be removed
+It is possible to use [nocolor][/nocolor] to prevent the use of legacy color codes in a block;
+[nobbcode][/nobbcode] will prevent the use of bbcode in a block;

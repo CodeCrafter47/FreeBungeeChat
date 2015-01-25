@@ -34,6 +34,7 @@ public class ChatParser {
         Deque<ClickEvent> clickEventDeque = new LinkedList<>();
         Deque<HoverEvent> hoverEventDeque = new LinkedList<>();
         while (matcher.find()){
+            boolean parsed = false;
             {
                 StringBuffer stringBuffer = new StringBuffer();
                 matcher.appendReplacement(stringBuffer, "");
@@ -85,6 +86,7 @@ public class ChatParser {
                                 current.setHoverEvent(hoverEventDeque.peek());
                             }
                     }
+                    parsed = true;
                 }
             }
             if(group_tag != null && nobbcodeLevel <= 0){
@@ -96,6 +98,7 @@ public class ChatParser {
                     } else {
                         current.setBold(false);
                     }
+                    parsed = true;
                 } else if(group_tag.matches("(?i)^/b$")){
                     forceBold--;
                     if (forceBold <= 0){
@@ -103,6 +106,7 @@ public class ChatParser {
                     } else{
                         current.setBold(true);
                     }
+                    parsed = true;
                 }
                 // [i]this is italic[/i]
                 if (group_tag.matches("(?i)^i$")){
@@ -112,6 +116,7 @@ public class ChatParser {
                     } else {
                         current.setItalic(false);
                     }
+                    parsed = true;
                 } else if(group_tag.matches("(?i)^/i$")){
                     forceItalic--;
                     if (forceItalic <= 0){
@@ -119,6 +124,7 @@ public class ChatParser {
                     } else{
                         current.setItalic(true);
                     }
+                    parsed = true;
                 }
                 // [u]this is underlined[/u]
                 if (group_tag.matches("(?i)^u$")){
@@ -128,6 +134,7 @@ public class ChatParser {
                     } else {
                         current.setUnderlined(false);
                     }
+                    parsed = true;
                 } else if(group_tag.matches("(?i)^/u$")){
                     forceUnderlined--;
                     if (forceUnderlined <= 0){
@@ -135,6 +142,7 @@ public class ChatParser {
                     } else{
                         current.setUnderlined(true);
                     }
+                    parsed = true;
                 }
                 // [s]this is crossed out[/s]
                 if (group_tag.matches("(?i)^s$")){
@@ -144,6 +152,7 @@ public class ChatParser {
                     } else {
                         current.setStrikethrough(false);
                     }
+                    parsed = true;
                 } else if(group_tag.matches("(?i)^/s$")){
                     forceStrikethrough--;
                     if (forceStrikethrough <= 0){
@@ -151,6 +160,7 @@ public class ChatParser {
                     } else{
                         current.setStrikethrough(true);
                     }
+                    parsed = true;
                 }
                 // [color=red]huh this is red...[/color]
                 if(group_tag.matches("(?i)^color=.*$")){
@@ -170,11 +180,13 @@ public class ChatParser {
                         colorDeque.push(ChatColor.WHITE);
                         current.setColor(ChatColor.WHITE);
                     }
+                    parsed = true;
                 } else if(group_tag.matches("(?i)^/color$")){
                     if(!colorDeque.isEmpty()){
                         colorDeque.pop();
                         current.setColor(colorDeque.pop());
                     }
+                    parsed = true;
                 }
                 // [url=....]
                 if(group_tag.matches("(?i)^url=.*$")){
@@ -185,6 +197,7 @@ public class ChatParser {
                     ClickEvent clickEvent = new ClickEvent(ClickEvent.Action.OPEN_URL, url);
                     clickEventDeque.push(clickEvent);
                     current.setClickEvent(clickEvent);
+                    parsed = true;
                 }
                 // [/url], [/command], [/suggest]
                 if(group_tag.matches("(?i)^/(?:url|command|suggest)$")){
@@ -194,24 +207,28 @@ public class ChatParser {
                     } else {
                         current.setClickEvent(clickEventDeque.peek());
                     }
+                    parsed = true;
                 }
                 // [command=....]
                 if(group_tag.matches("(?i)^command=.*")){
                     ClickEvent clickEvent = new ClickEvent(ClickEvent.Action.RUN_COMMAND, group_value);
                     clickEventDeque.push(clickEvent);
                     current.setClickEvent(clickEvent);
+                    parsed = true;
                 }
                 // [suggest=....]
                 if(group_tag.matches("(?i)^suggest=.*")){
                     ClickEvent clickEvent = new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, group_value);
                     clickEventDeque.push(clickEvent);
                     current.setClickEvent(clickEvent);
+                    parsed = true;
                 }
                 // [hover=....]...[/hover]
                 if(group_tag.matches("(?i)^hover=.*$")){
                     HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, parse(group_value));
                     hoverEventDeque.push(hoverEvent);
                     current.setHoverEvent(hoverEvent);
+                    parsed = true;
                 } else if(group_tag.matches("(?i)^/hover$")){
                     if(!hoverEventDeque.isEmpty())hoverEventDeque.pop();
                     if(hoverEventDeque.isEmpty()){
@@ -219,6 +236,7 @@ public class ChatParser {
                     } else {
                         current.setHoverEvent(hoverEventDeque.peek());
                     }
+                    parsed = true;
                 }
             }
             if(group_implicitTag != null && nobbcodeLevel <= 0){
@@ -231,33 +249,48 @@ public class ChatParser {
                     ClickEvent clickEvent = new ClickEvent(ClickEvent.Action.OPEN_URL, url);
                     clickEventDeque.push(clickEvent);
                     current.setClickEvent(clickEvent);
+                    parsed = true;
                 }
                 // [command]/spawn[/command]
                 if(group_implicitTag.matches("(?i)^command$")){
                     ClickEvent clickEvent = new ClickEvent(ClickEvent.Action.RUN_COMMAND, group_implicitValue);
                     clickEventDeque.push(clickEvent);
                     current.setClickEvent(clickEvent);
+                    parsed = true;
                 }
                 // [suggest]/friend add [/suggest]
                 if(group_implicitTag.matches("(?i)^suggest$")){
                     ClickEvent clickEvent = new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, group_implicitValue);
                     clickEventDeque.push(clickEvent);
                     current.setClickEvent(clickEvent);
+                    parsed = true;
                 }
             }
             if(group_tag != null){
                 if(group_tag.matches("(?i)^nocolor$")){
                     nocolorLevel++;
+                    parsed = true;
                 }
                 if(group_tag.matches("(?i)^/nocolor$")){
                     nocolorLevel--;
+                    parsed = true;
                 }
                 if(group_tag.matches("(?i)^nobbcode$")){
                     nobbcodeLevel++;
+                    parsed = true;
                 }
                 if(group_tag.matches("(?i)^/nobbcode$")){
                     nobbcodeLevel--;
+                    parsed = true;
                 }
+            }
+            if(!parsed){
+                StringBuffer stringBuffer = new StringBuffer();
+                matcher.appendReplacement(stringBuffer, "$0");
+                TextComponent component = new TextComponent(current);
+                current.setText(stringBuffer.toString());
+                components.add(current);
+                current = component;
             }
         }
         StringBuffer stringBuffer = new StringBuffer();

@@ -43,7 +43,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
 
 public class FreeBungeeChat extends Plugin implements Listener{
     private final Map<String, String> replyTarget = new HashMap<>();
@@ -91,8 +90,8 @@ public class FreeBungeeChat extends Plugin implements Listener{
                 ProxiedPlayer target = getProxy().getPlayer(args[0]);
                 ProxiedPlayer player = (ProxiedPlayer) cs;
                 if (target == null) {
-                    String text = config.getString("unknownTarget").replaceAll(
-                            "%target%", args[0]);
+                    String text = config.getString("unknownTarget").replace(
+                            "%target%", wrapVariable(args[0]));
                     player.sendMessage(ChatParser.parse(text));
                     return;
                 }
@@ -104,8 +103,8 @@ public class FreeBungeeChat extends Plugin implements Listener{
 
 				// check ignored
 				if(ignoredPlayers.get(target.getName()) != null && ignoredPlayers.get(target.getName()).contains(player.getName())){
-					text = config.getString("ignored").replaceAll(
-							"%target%", args[0]);
+					text = config.getString("ignored").replace(
+                            "%target%", wrapVariable(args[0]));
 					player.sendMessage(ChatParser.parse(text));
 					return;
 				}
@@ -113,20 +112,20 @@ public class FreeBungeeChat extends Plugin implements Listener{
 				text = replaceRegex(text);
 
                 player.sendMessage(ChatParser.parse(
-                        config.getString("privateMessageSend").replaceAll(
-                                "%target%", target.
-                                        getDisplayName()).replaceAll(
-                                "%player%", player.
-                                        getDisplayName()).replace(
-                                "%message%", Matcher.quoteReplacement(text))));
+                        config.getString("privateMessageSend").replace(
+                                "%target%", wrapVariable(target.
+                                        getDisplayName())).replace(
+                                "%player%", wrapVariable(player.
+                                        getDisplayName())).replace(
+                                "%message%", text)));
 
                 target.sendMessage(ChatParser.parse(
-                        config.getString("privateMessageReceive").replaceAll(
-                                "%target%", target.
-                                        getDisplayName()).replaceAll(
-                                "%player%", player.
-                                        getDisplayName()).replace(
-                                "%message%", Matcher.quoteReplacement(text))));
+                        config.getString("privateMessageReceive").replace(
+                                "%target%", wrapVariable(target.
+                                        getDisplayName())).replace(
+                                "%player%", wrapVariable(player.
+                                        getDisplayName())).replace(
+                                "%message%", text)));
 
                 replyTarget.put(target.getName(), player.getName());
             }
@@ -144,18 +143,18 @@ public class FreeBungeeChat extends Plugin implements Listener{
                 ProxiedPlayer target = getReplyTarget(player);
 
                 if (target == null) {
-                    String text = config.getString("unknownTarget").replaceAll(
+                    String text = config.getString("unknownTarget").replace(
                             "%target%",
-							args[0]);
+                            wrapVariable(args[0]));
                     player.sendMessage(ChatParser.parse(text));
                     return;
                 }
 
 				// check ignored
 				if(ignoredPlayers.get(target.getName()) != null && ignoredPlayers.get(target.getName()).contains(player.getName())){
-					String text = config.getString("ignored").replaceAll(
-							"%target%",
-							args[0]);
+					String text = config.getString("ignored").replace(
+                            "%target%",
+                            wrapVariable(args[0]));
 					player.sendMessage(ChatParser.parse(text));
 					return;
 				}
@@ -168,20 +167,20 @@ public class FreeBungeeChat extends Plugin implements Listener{
 				text = replaceRegex(text);
 
                 player.sendMessage(ChatParser.parse(
-						replaceVariables(target, replaceVariables(player, config.getString("privateMessageSend").replaceAll(
-                                "%target%", target.
-                                        getDisplayName()).replaceAll(
-                                "%player%", player.
-                                        getDisplayName()).replace(
+                        replaceVariables(target, replaceVariables(player, config.getString("privateMessageSend").replace(
+                                "%target%", wrapVariable(target.
+                                        getDisplayName())).replace(
+                                "%player%", wrapVariable(player.
+                                        getDisplayName())).replace(
                                 "%message%", text), ""), "t")));
 
                 target.sendMessage(ChatParser.parse(
-						replaceVariables(target, replaceVariables(player, config.getString("privateMessageReceive").replaceAll(
-                                "%target%", target.
-                                        getDisplayName()).replaceAll(
-                                "%player%", player.
-                                        getDisplayName()).replace(
-								"%message%", Matcher.quoteReplacement(text)), ""), "t")));
+                        replaceVariables(target, replaceVariables(player, config.getString("privateMessageReceive").replace(
+                                "%target%", wrapVariable(target.
+                                        getDisplayName())).replace(
+                                "%player%", wrapVariable(player.
+                                        getDisplayName())).replace(
+                                "%message%", text), ""), "t")));
 
                 replyTarget.put(target.getName(), player.getName());
             }
@@ -207,9 +206,9 @@ public class FreeBungeeChat extends Plugin implements Listener{
 					message = replaceRegex(message);
 
                     // replace variables
-                    String text = config.getString("chatFormat").replaceAll("%player%",
-							((ProxiedPlayer) cs).getDisplayName());
-                    text = text.replaceAll("%message%", Matcher.quoteReplacement(message));
+                    String text = config.getString("chatFormat").replace("%player%",
+                            wrapVariable(((ProxiedPlayer) cs).getDisplayName()));
+                    text = text.replace("%message%", wrapVariable(message));
 					text = replaceVariables(((ProxiedPlayer) cs), text, "");
 
                     // broadcast message
@@ -240,9 +239,9 @@ public class FreeBungeeChat extends Plugin implements Listener{
 					ProxiedPlayer toIgnore = getProxy().getPlayer(args[0]);
 
 					if(toIgnore == null){
-						String text = config.getString("unknownTarget").replaceAll(
-								"%target%",
-								args[0]);
+						String text = config.getString("unknownTarget").replace(
+                                "%target%",
+                                wrapVariable(args[0]));
 						cs.sendMessage(ChatParser.parse(text));
 						return;
 					}
@@ -252,16 +251,16 @@ public class FreeBungeeChat extends Plugin implements Listener{
 					if(ignoreList == null) ignoreList = new ArrayList<>(1);
 					if(!ignoreList.contains(toIgnore.getName())) {
 						ignoreList.add(toIgnore.getName());
-						String text = config.getString("ignoreSuccess").replaceAll(
-								"%target%",
-								args[0]);
+						String text = config.getString("ignoreSuccess").replace(
+                                "%target%",
+                                wrapVariable(args[0]));
 						cs.sendMessage(ChatParser.parse(text));
 					}
 					else {
 						ignoreList.remove(toIgnore.getName());
-						String text = config.getString("ignoreUnignore").replaceAll(
-								"%target%",
-								args[0]);
+						String text = config.getString("ignoreUnignore").replace(
+                                "%target%",
+                                wrapVariable(args[0]));
 						cs.sendMessage(ChatParser.parse(text));
 					}
 					ignoredPlayers.put(cs.getName(), ignoreList);
@@ -292,9 +291,9 @@ public class FreeBungeeChat extends Plugin implements Listener{
 		message = replaceRegex(message);
 
         // replace variables
-        String text = config.getString("chatFormat").replaceAll("%player%",
-				((ProxiedPlayer) event.getSender()).getDisplayName());
-        text = text.replaceAll("%message%", Matcher.quoteReplacement(message));
+        String text = config.getString("chatFormat").replace("%player%",
+                wrapVariable(((ProxiedPlayer) event.getSender()).getDisplayName()));
+        text = text.replace("%message%", message);
 		text = replaceVariables(((ProxiedPlayer) event.getSender()), text, "");
 
 		// broadcast message
@@ -351,20 +350,20 @@ public class FreeBungeeChat extends Plugin implements Listener{
     }
 
 	private String replaceVariables(ProxiedPlayer player, String text, String prefix){
-		text = text.replaceAll("%"+prefix+"group%", Matcher.quoteReplacement(bukkitBridge.getPlayerInformation(player, "group")));
-		text = text.replaceAll("%"+prefix+"prefix%", Matcher.quoteReplacement(bukkitBridge.getPlayerInformation(player, "prefix")));
-		text = text.replaceAll("%"+prefix+"suffix%", Matcher.quoteReplacement(bukkitBridge.getPlayerInformation(player, "suffix")));
-		text = text.replaceAll("%"+prefix+"balance%", Matcher.quoteReplacement(bukkitBridge.getPlayerInformation(player, "balance")));
-		text = text.replaceAll("%"+prefix+"currency%", Matcher.quoteReplacement(bukkitBridge.getPlayerInformation(player, "currency")));
-		text = text.replaceAll("%"+prefix+"currencyPl%", Matcher.quoteReplacement(bukkitBridge.getPlayerInformation(player, "currencyPl")));
-		text = text.replaceAll("%"+prefix+"tabName%", Matcher.quoteReplacement(bukkitBridge.getPlayerInformation(player, "tabName")));
-		text = text.replaceAll("%"+prefix+"displayName%", Matcher.quoteReplacement(bukkitBridge.getPlayerInformation(player, "displayName")));
-		text = text.replaceAll("%"+prefix+"world%", Matcher.quoteReplacement(bukkitBridge.getPlayerInformation(player, "world")));
-		text = text.replaceAll("%"+prefix+"health%", Matcher.quoteReplacement(bukkitBridge.getPlayerInformation(player, "health")));
-		text = text.replaceAll("%"+prefix+"level%", Matcher.quoteReplacement(bukkitBridge.getPlayerInformation(player, "level")));
-		text = text.replaceAll("%"+prefix+"server%", Matcher.quoteReplacement(bukkitBridge.getPlayerInformation(player, "server")));
-		text = text.replaceAll("%newline%", "\n");
-		return text;
+		text = text.replace("%" + prefix + "group%", wrapVariable(bukkitBridge.getPlayerInformation(player, "group")));
+		text = text.replace("%" + prefix + "prefix%", wrapVariable(bukkitBridge.getPlayerInformation(player, "prefix")));
+		text = text.replace("%" + prefix + "suffix%", wrapVariable(bukkitBridge.getPlayerInformation(player, "suffix")));
+		text = text.replace("%" + prefix + "balance%", wrapVariable(bukkitBridge.getPlayerInformation(player, "balance")));
+		text = text.replace("%" + prefix + "currency%", wrapVariable(bukkitBridge.getPlayerInformation(player, "currency")));
+		text = text.replace("%" + prefix + "currencyPl%", wrapVariable(bukkitBridge.getPlayerInformation(player, "currencyPl")));
+        text = text.replace("%"+prefix+ "tabName%", wrapVariable(bukkitBridge.getPlayerInformation(player, "tabName")));
+        text = text.replace("%"+prefix+ "displayName%", wrapVariable(bukkitBridge.getPlayerInformation(player, "displayName")));
+        text = text.replace("%"+prefix+ "world%", wrapVariable(bukkitBridge.getPlayerInformation(player, "world")));
+        text = text.replace("%"+prefix+ "health%", wrapVariable(bukkitBridge.getPlayerInformation(player, "health")));
+        text = text.replace("%"+prefix+ "level%", wrapVariable(bukkitBridge.getPlayerInformation(player, "level")));
+        text = text.replace("%"+prefix+ "server%", wrapVariable(bukkitBridge.getPlayerInformation(player, "server")));
+        text = text.replace("%newline%", "\n");
+        return text;
 	}
 
 	private String replaceRegex(String str){
@@ -376,4 +375,12 @@ public class FreeBungeeChat extends Plugin implements Listener{
 		}
 		return str;
 	}
+
+    private String wrapVariable(String variable){
+        if(config.getBoolean("allowBBCodeInVariables", false)){
+            return variable;
+        } else {
+            return "[nobbcode]" + variable + "[/nobbcode]";
+        }
+    }
 }

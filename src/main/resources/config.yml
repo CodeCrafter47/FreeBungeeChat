@@ -82,3 +82,6 @@ enableIgnoreCommand: true
 #excludeServers:
 #  - spawn
 #  - survival
+
+# disallows bbcode in variables, prevents issues that might come up if square brackets are used in the prefix
+allowBBCodeInVariables: false
