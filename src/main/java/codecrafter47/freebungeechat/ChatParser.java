@@ -20,6 +20,9 @@ public class ChatParser {
             "(?:\\[(?<tag>/?(?:b|i|u|s|nocolor|nobbcode)|(?:url|command|hover|suggest|color)=(?<value>(?:(?:[^]\\[]*)\\[(?:[^]\\[]*)\\])*(?:[^]\\[]*))|/(?:url|command|hover|suggest|color))\\])|" +
             "(?:\\[(?<implicitTag>url|command|suggest)\\](?=(?<implicitValue>.*?)\\[/\\k<implicitTag>\\]).*)");
 
+    private static Pattern strip_bbcode_pattern = Pattern.compile("(?ims)(?:\\[(?<tag>/?(?:b|i|u|s|nocolor|nobbcode)|(?:url|command|hover|suggest|color)=(?<value>(?:(?:[^]\\[]*)\\[(?:[^]\\[]*)\\])*(?:[^]\\[]*))|/(?:url|command|hover|suggest|color))\\])|" +
+            "(?:\\[(?<implicitTag>url|command|suggest)\\](?=(?<implicitValue>.*?)\\[/\\k<implicitTag>\\]).*)");
+
     public static BaseComponent[] parse(String text){
         Matcher matcher = pattern.matcher(text);
         TextComponent current = new TextComponent();
@@ -298,5 +301,9 @@ public class ChatParser {
         current.setText(stringBuffer.toString());
         components.add(current);
         return components.toArray(new BaseComponent[components.size()]);
+    }
+
+    public static String stripBBCode(String string){
+        return pattern.matcher(string).replaceAll("");
     }
 }

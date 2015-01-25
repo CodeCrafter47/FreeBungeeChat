@@ -6,7 +6,8 @@ The chat plugin I use on my server
 Permissions
 ===========
 
-there are no permissions
+freebungeechat.chat.color - allows players to use color codes in chat
+freebungeechat.chat.bbcode - allows players to use bbcode in chat
 
 Commands
 ========

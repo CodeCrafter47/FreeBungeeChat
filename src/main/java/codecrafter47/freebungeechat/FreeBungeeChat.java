@@ -19,6 +19,7 @@ package codecrafter47.freebungeechat;
 import codecrafter47.freebungeechat.bukkitbridge.Constants;
 import com.google.common.base.Charsets;
 import lombok.SneakyThrows;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -109,6 +110,7 @@ public class FreeBungeeChat extends Plugin implements Listener{
 					return;
 				}
 
+                text = preparePlayerChat(text, player);
 				text = replaceRegex(text);
 
                 player.sendMessage(ChatParser.parse(
@@ -164,6 +166,7 @@ public class FreeBungeeChat extends Plugin implements Listener{
                     text = text + arg + " ";
                 }
 
+                text = preparePlayerChat(text, player);
 				text = replaceRegex(text);
 
                 player.sendMessage(ChatParser.parse(
@@ -203,6 +206,7 @@ public class FreeBungeeChat extends Plugin implements Listener{
                         message = message + arg + " ";
                     }
 
+                    message = preparePlayerChat(message, (ProxiedPlayer) cs);
 					message = replaceRegex(message);
 
                     // replace variables
@@ -288,6 +292,7 @@ public class FreeBungeeChat extends Plugin implements Listener{
             return;
         }
 
+        message = preparePlayerChat(message, (ProxiedPlayer) event.getSender());
 		message = replaceRegex(message);
 
         // replace variables
@@ -382,5 +387,16 @@ public class FreeBungeeChat extends Plugin implements Listener{
         } else {
             return "[nobbcode]" + variable + "[/nobbcode]";
         }
+    }
+
+    private String preparePlayerChat(String text, ProxiedPlayer player){
+        if(!player.hasPermission("freebungeechat.chat.color")){
+            text = ChatColor.translateAlternateColorCodes('&', text);
+            text = ChatColor.stripColor(text);
+        }
+        if(!player.hasPermission("freebungeechat.chat.bbcode")){
+            text = ChatParser.stripBBCode(text);
+        }
+        return text;
     }
 }
