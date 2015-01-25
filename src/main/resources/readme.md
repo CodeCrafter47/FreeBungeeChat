@@ -18,14 +18,18 @@ Commands
 Text Format
 ===========
 
-Color codes work with `&` or `§`.
-italic text using `*` or `_`: `this is *italic* and this is _italic_ too`
-bold text using `**` or `__`: `this is **bold** and this is __bold__ too`
-links: `<spigotmc.org>`
-links with custom text: `click [here](spigotmc.org)`
-text with tooltip: `[text]{this appears if you hover over the text} ...`
-link with tooltip: `click [here](spigotmc.org){for the best plugins :D}`
-execute command: `> [DAY](/time set 6000) | [NIGHT](/time set 18000)`
-propose command: `[message the developer][/w CodeCrafter47 ]`
-Of cause commands can have tooltips too.
-You can escape special char with a backslash
+You can create links and access other formatting options with a syntax similar to bbcode. Vanilla color codes still work.
+
+For example [b]this is bold[/b], [i]this is italic[/i], [u]this is underlined[/u] and [s]this is crossed out[/s].
+The difference between the above and making something &lbold&r the vanilla way is, that the above makes all the enclosed
+text bold, while &b makes bold everything until reaching the next color code.
+Same for [color=...]
+
+How links will work is easy to guess, e.g. it's just [url]spigotmc.org[/url] or [url=click here]spigotmc.org[/url].
+Executing commands works similar [command=/tp CodeCrafter47]click here[/command].
+
+Suggesting commands works with [suggest=/tp ]...[/suggest]
+To create tooltips d [hover=Text magically appears when moving the mouse over]this[/hover].
+
+It is possible to use [nocolor][/nocolor] to prevent the use of legacy color codes in a block; color codes will be removed
+[nobbcode][/nobbcode] will prevent the use of bbcode in a block; bbcode will be removed

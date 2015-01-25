@@ -1,6 +1,6 @@
 name: FreeBungeeChat
 main: codecrafter47.freebungeechat.bukkitbridge.BukkitBridge
-version: 1.4
+version: 2.0
 authors:
   - CodeCrafter47
 softdepend: [Vault]

@@ -92,9 +92,8 @@ public class FreeBungeeChat extends Plugin implements Listener{
                 ProxiedPlayer player = (ProxiedPlayer) cs;
                 if (target == null) {
                     String text = config.getString("unknownTarget").replaceAll(
-                            "%target%",
-                            ChatUtil.escapeSpecialChars(args[0]));
-                    player.sendMessage(ChatUtil.parseString(text));
+                            "%target%", args[0]);
+                    player.sendMessage(ChatParser.parse(text));
                     return;
                 }
 
@@ -106,28 +105,27 @@ public class FreeBungeeChat extends Plugin implements Listener{
 				// check ignored
 				if(ignoredPlayers.get(target.getName()) != null && ignoredPlayers.get(target.getName()).contains(player.getName())){
 					text = config.getString("ignored").replaceAll(
-							"%target%",
-							ChatUtil.escapeSpecialChars(args[0]));
-					player.sendMessage(ChatUtil.parseString(text));
+							"%target%", args[0]);
+					player.sendMessage(ChatParser.parse(text));
 					return;
 				}
 
 				text = replaceRegex(text);
 
-                player.sendMessage(ChatUtil.parseString(
+                player.sendMessage(ChatParser.parse(
                         config.getString("privateMessageSend").replaceAll(
-                                "%target%", ChatUtil.escapeSpecialChars(target.
-                                        getDisplayName())).replaceAll(
-                                "%player%", ChatUtil.escapeSpecialChars(player.
-                                        getDisplayName())).replace(
+                                "%target%", target.
+                                        getDisplayName()).replaceAll(
+                                "%player%", player.
+                                        getDisplayName()).replace(
                                 "%message%", Matcher.quoteReplacement(text))));
 
-                target.sendMessage(ChatUtil.parseString(
+                target.sendMessage(ChatParser.parse(
                         config.getString("privateMessageReceive").replaceAll(
-                                "%target%", ChatUtil.escapeSpecialChars(target.
-                                        getDisplayName())).replaceAll(
-                                "%player%", ChatUtil.escapeSpecialChars(player.
-                                        getDisplayName())).replace(
+                                "%target%", target.
+                                        getDisplayName()).replaceAll(
+                                "%player%", player.
+                                        getDisplayName()).replace(
                                 "%message%", Matcher.quoteReplacement(text))));
 
                 replyTarget.put(target.getName(), player.getName());
@@ -148,8 +146,8 @@ public class FreeBungeeChat extends Plugin implements Listener{
                 if (target == null) {
                     String text = config.getString("unknownTarget").replaceAll(
                             "%target%",
-							ChatUtil.escapeSpecialChars(args[0]));
-                    player.sendMessage(ChatUtil.parseString(text));
+							args[0]);
+                    player.sendMessage(ChatParser.parse(text));
                     return;
                 }
 
@@ -157,8 +155,8 @@ public class FreeBungeeChat extends Plugin implements Listener{
 				if(ignoredPlayers.get(target.getName()) != null && ignoredPlayers.get(target.getName()).contains(player.getName())){
 					String text = config.getString("ignored").replaceAll(
 							"%target%",
-							ChatUtil.escapeSpecialChars(args[0]));
-					player.sendMessage(ChatUtil.parseString(text));
+							args[0]);
+					player.sendMessage(ChatParser.parse(text));
 					return;
 				}
 
@@ -169,20 +167,20 @@ public class FreeBungeeChat extends Plugin implements Listener{
 
 				text = replaceRegex(text);
 
-                player.sendMessage(ChatUtil.parseString(
+                player.sendMessage(ChatParser.parse(
 						replaceVariables(target, replaceVariables(player, config.getString("privateMessageSend").replaceAll(
-                                "%target%", ChatUtil.escapeSpecialChars(target.
-                                        getDisplayName())).replaceAll(
-                                "%player%", ChatUtil.escapeSpecialChars(player.
-                                        getDisplayName())).replace(
+                                "%target%", target.
+                                        getDisplayName()).replaceAll(
+                                "%player%", player.
+                                        getDisplayName()).replace(
                                 "%message%", text), ""), "t")));
 
-                target.sendMessage(ChatUtil.parseString(
+                target.sendMessage(ChatParser.parse(
 						replaceVariables(target, replaceVariables(player, config.getString("privateMessageReceive").replaceAll(
-                                "%target%", ChatUtil.escapeSpecialChars(target.
-                                        getDisplayName())).replaceAll(
-                                "%player%", ChatUtil.escapeSpecialChars(player.
-                                        getDisplayName())).replace(
+                                "%target%", target.
+                                        getDisplayName()).replaceAll(
+                                "%player%", player.
+                                        getDisplayName()).replace(
 								"%message%", Matcher.quoteReplacement(text)), ""), "t")));
 
                 replyTarget.put(target.getName(), player.getName());
@@ -210,12 +208,12 @@ public class FreeBungeeChat extends Plugin implements Listener{
 
                     // replace variables
                     String text = config.getString("chatFormat").replaceAll("%player%",
-							ChatUtil.escapeSpecialChars(((ProxiedPlayer) cs).getDisplayName()));
+							((ProxiedPlayer) cs).getDisplayName());
                     text = text.replaceAll("%message%", Matcher.quoteReplacement(message));
 					text = replaceVariables(((ProxiedPlayer) cs), text, "");
 
                     // broadcast message
-                    BaseComponent[] msg = ChatUtil.parseString(text);
+                    BaseComponent[] msg = ChatParser.parse(text);
 					for(ProxiedPlayer target: getProxy().getPlayers()){
 						if(ignoredPlayers.get(target.getName()) != null && ignoredPlayers.get(target.getName()).contains(cs.getName()))continue;
 						if(target.getServer() == null || !excludedServers.contains(target.getServer().getInfo().getName()))target.sendMessage(msg);
@@ -244,8 +242,8 @@ public class FreeBungeeChat extends Plugin implements Listener{
 					if(toIgnore == null){
 						String text = config.getString("unknownTarget").replaceAll(
 								"%target%",
-								ChatUtil.escapeSpecialChars(args[0]));
-						cs.sendMessage(ChatUtil.parseString(text));
+								args[0]);
+						cs.sendMessage(ChatParser.parse(text));
 						return;
 					}
 
@@ -256,15 +254,15 @@ public class FreeBungeeChat extends Plugin implements Listener{
 						ignoreList.add(toIgnore.getName());
 						String text = config.getString("ignoreSuccess").replaceAll(
 								"%target%",
-								ChatUtil.escapeSpecialChars(args[0]));
-						cs.sendMessage(ChatUtil.parseString(text));
+								args[0]);
+						cs.sendMessage(ChatParser.parse(text));
 					}
 					else {
 						ignoreList.remove(toIgnore.getName());
 						String text = config.getString("ignoreUnignore").replaceAll(
 								"%target%",
-								ChatUtil.escapeSpecialChars(args[0]));
-						cs.sendMessage(ChatUtil.parseString(text));
+								args[0]);
+						cs.sendMessage(ChatParser.parse(text));
 					}
 					ignoredPlayers.put(cs.getName(), ignoreList);
 				}
@@ -295,12 +293,12 @@ public class FreeBungeeChat extends Plugin implements Listener{
 
         // replace variables
         String text = config.getString("chatFormat").replaceAll("%player%",
-				ChatUtil.escapeSpecialChars(((ProxiedPlayer) event.getSender()).getDisplayName()));
+				((ProxiedPlayer) event.getSender()).getDisplayName());
         text = text.replaceAll("%message%", Matcher.quoteReplacement(message));
 		text = replaceVariables(((ProxiedPlayer) event.getSender()), text, "");
 
 		// broadcast message
-		BaseComponent[] msg = ChatUtil.parseString(text);
+		BaseComponent[] msg = ChatParser.parse(text);
 		for(ProxiedPlayer target: getProxy().getPlayers()){
 			if(ignoredPlayers.get(target.getName()) != null && ignoredPlayers.get(target.getName()).contains(((ProxiedPlayer) event.getSender()).getName()))continue;
 			if(!excludedServers.contains(target.getServer().getInfo().getName()))target.sendMessage(msg);
