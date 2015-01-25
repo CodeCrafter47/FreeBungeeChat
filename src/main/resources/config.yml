@@ -30,6 +30,39 @@ regex:
 # shows link target in tooltip for security reasons
     - search: '(?:(?<!\\)\[(?<text>[^\]]*?)(?<!\\)\](?=[({])(?:\((?<url>.*?)(?<!\\)\))(?:\{(?<tooltip>.*?)(?<!\\)\})?)'
       replace: "[${text}](${url}){${tooltip}%newline%${url}}"
+# some smileys
+    - search: '--->'
+      replace: "\u21DB"
+    - search: '<---'
+      replace: "\u21DA"
+    - search: '-->'
+      replace: "\u21D2"
+    - search: '<--'
+      replace: "\u21D0"
+    - search: '->'
+      replace: "\u2192"
+    - search: '<-'
+      replace: "\u2190"
+    - search: '(?i)\(C\)'
+      replace: "\u00A9"
+    - search: '(?i)\(R\)'
+      replace: "\u00AE"
+    - search: '\(o\)|\(O\)|\(time\)'
+      replace: "\u231A"
+    - search: '\(rain\)'
+      replace: "\u2602"
+    - search: '\(sun\)'
+      replace: "\u2600"
+    - search: '\(\*\)'
+      replace: "\u2605"
+    - search: ':\)|:=\)|:-\)'
+      replace: "\u263A"
+    - search: ':\(|:=\(|:-\('
+      replace: "\u2639"
+    - search: '(?i):[-=]?D'
+      replace: "\u263B"
+    - search: '<3'
+      replace: "\u2764"
 
 ###########################################################
 # ONLY EDIT BELOW SETTINGS IF YOU KNOW WHAT YOU ARE DOING #
