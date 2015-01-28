@@ -8,6 +8,7 @@ Permissions
 
 freebungeechat.chat.color - allows players to use color codes in chat
 freebungeechat.chat.bbcode - allows players to use bbcode in chat
+freebungeechat.admin - required for /fbc reload
 
 Commands
 ========
@@ -15,6 +16,7 @@ Commands
 `/tell`, `/message`, `/w`, `/whisper`, `/msg` - send a private message
 `/r` - reply to a previous message
 `/ignore` - don't receive messages from a specific player
+`/freebungeechat reload` - reload the configuration
 
 Text Format
 ===========

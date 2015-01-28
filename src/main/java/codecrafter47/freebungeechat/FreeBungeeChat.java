@@ -80,6 +80,26 @@ public class FreeBungeeChat extends Plugin implements Listener{
 
         super.getProxy().getPluginManager().registerListener(this, this);
 
+        super.getProxy().getPluginManager().registerCommand(this, new Command("freebungeechat", "freebungeechat.admin", "fbc") {
+            @Override
+            public void execute(CommandSender commandSender, String[] strings) {
+                if(strings.length == 1 && strings[0].equalsIgnoreCase("reload")){
+                    try {
+                        config = ConfigurationProvider.getProvider(YamlConfiguration.class).load(new InputStreamReader(new FileInputStream(new File(getDataFolder(), "config.yml")), Charsets.UTF_8));
+                        if(config.getStringList("excludeServers") != null){
+                            excludedServers = config.getStringList("excludeServers");
+                        }
+                        commandSender.sendMessage(ChatParser.parse("[color=blue][[color=red]FreeBungeeChat[/color]][/color] &aConfiguration has been reloaded."));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        commandSender.sendMessage(ChatParser.parse("[color=blue][[color=red]FreeBungeeChat[/color]][/color] &cThere has been an error while reloading the config. See the console for more details"));
+                    }
+                } else {
+                    commandSender.sendMessage(ChatParser.parse("[color=blue][[color=red]FreeBungeeChat[/color]][/color] &f[suggest]/freebungeechat reload[/suggest]"));
+                }
+            }
+        });
+
         super.getProxy().getPluginManager().registerCommand(this, new Command(
                 "whisper", null, "w", "msg", "message", "tell") {
 
