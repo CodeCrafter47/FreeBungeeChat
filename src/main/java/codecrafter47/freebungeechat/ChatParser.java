@@ -6,7 +6,6 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.apache.commons.lang.ArrayUtils;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -18,10 +17,10 @@ import java.util.regex.Pattern;
 public class ChatParser {
     private static Pattern pattern = Pattern.compile("(?ims)(?=\\n)|(?:[&\u00A7](?<color>[0-9A-FK-OR]))|" +
             "(?:\\[(?<tag>/?(?:b|i|u|s|nocolor|nobbcode)|(?:url|command|hover|suggest|color)=(?<value>(?:(?:[^]\\[]*)\\[(?:[^]\\[]*)\\])*(?:[^]\\[]*))|/(?:url|command|hover|suggest|color))\\])|" +
-            "(?:\\[(?<implicitTag>url|command|suggest)\\](?=(?<implicitValue>.*?)\\[/\\k<implicitTag>\\]).*)");
+            "(?:\\[(?<implicitTag>url|command|suggest)\\](?=(?<implicitValue>.*?)\\[/\\k<implicitTag>\\]))");
 
     private static Pattern strip_bbcode_pattern = Pattern.compile("(?ims)(?:\\[(?<tag>/?(?:b|i|u|s|nocolor|nobbcode)|(?:url|command|hover|suggest|color)=(?<value>(?:(?:[^]\\[]*)\\[(?:[^]\\[]*)\\])*(?:[^]\\[]*))|/(?:url|command|hover|suggest|color))\\])|" +
-            "(?:\\[(?<implicitTag>url|command|suggest)\\](?=(?<implicitValue>.*?)\\[/\\k<implicitTag>\\]).*)");
+            "(?:\\[(?<implicitTag>url|command|suggest)\\](?=(?<implicitValue>.*?)\\[/\\k<implicitTag>\\]))");
 
     public static BaseComponent[] parse(String text){
         Matcher matcher = pattern.matcher(text);
@@ -288,10 +287,8 @@ public class ChatParser {
                 }
             }
             if(!parsed){
-                StringBuffer stringBuffer = new StringBuffer();
-                matcher.appendReplacement(stringBuffer, "$0");
                 TextComponent component = new TextComponent(current);
-                current.setText(stringBuffer.toString());
+                current.setText(matcher.group(0));
                 components.add(current);
                 current = component;
             }
@@ -304,6 +301,6 @@ public class ChatParser {
     }
 
     public static String stripBBCode(String string){
-        return pattern.matcher(string).replaceAll("");
+        return strip_bbcode_pattern.matcher(string).replaceAll("");
     }
 }
