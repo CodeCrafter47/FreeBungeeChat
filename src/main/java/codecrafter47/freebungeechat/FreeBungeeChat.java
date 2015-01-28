@@ -36,10 +36,7 @@ import net.md_5.bungee.event.EventPriority;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class FreeBungeeChat extends Plugin implements Listener{
     public final Map<String, String> replyTarget = new HashMap<>();
@@ -75,19 +72,42 @@ public class FreeBungeeChat extends Plugin implements Listener{
 		bukkitBridge.enable();
 
         super.getProxy().getPluginManager().registerListener(this, this);
+        List<String> aliases;
 
-        super.getProxy().getPluginManager().registerCommand(this, new ReloadCommand(this, "freebungeechat", "freebungeechat.admin", "fbc"));
-
-        super.getProxy().getPluginManager().registerCommand(this, new MessageCommand(this, "whisper", null, "w", "msg", "message", "tell"));
-
-        super.getProxy().getPluginManager().registerCommand(this, new ReplyCommand(this, "reply", null, "r"));
-
-        if(!config.getBoolean("alwaysGlobalChat", true)) {
-            super.getProxy().getPluginManager().registerCommand(this, new GlobalChatCommand(this, "global", null, "g"));
+        aliases = config.getStringList("adminCommandAliases");
+        if(aliases == null || aliases.isEmpty())aliases = Arrays.asList("freebungeechat", "fbc");
+        if(config.getBoolean("enableAdminCommand", true)) {
+            super.getProxy().getPluginManager().registerCommand(this,
+                    new ReloadCommand(this, aliases.get(0), "freebungeechat.admin",
+                            aliases.subList(1, aliases.size()).toArray(new String[aliases.size() - 1])));
         }
 
-		if(config.getBoolean("enableIgnoreCommand", true)) {
-			super.getProxy().getPluginManager().registerCommand(this, new IgnoreCommand(this, "ignore", null));
+        aliases = config.getStringList("messageCommandAliases");
+        if(aliases == null || aliases.isEmpty())aliases = Arrays.asList("w", "msg", "message", "tell", "whisper");
+        if(config.getBoolean("enableMessageCommand", true)) {
+            super.getProxy().getPluginManager().registerCommand(this, new MessageCommand(this, aliases.get(0), null,
+                    aliases.subList(1, aliases.size()).toArray(new String[aliases.size() - 1])));
+        }
+
+        aliases = config.getStringList("replyCommandAliases");
+        if(aliases == null || aliases.isEmpty())aliases = Arrays.asList("reply", "r");
+        if(config.getBoolean("enableReplyCommand", true)) {
+            super.getProxy().getPluginManager().registerCommand(this, new ReplyCommand(this, aliases.get(0), null,
+                    aliases.subList(1, aliases.size()).toArray(new String[aliases.size() - 1])));
+        }
+
+        aliases = config.getStringList("globalChatCommandAliases");
+        if(aliases == null || aliases.isEmpty())aliases = Arrays.asList("global", "g");
+        if(config.getBoolean("enableGlobalChatCommand", true)) {
+            super.getProxy().getPluginManager().registerCommand(this, new GlobalChatCommand(this, aliases.get(0), null,
+                    aliases.subList(1, aliases.size()).toArray(new String[aliases.size() - 1])));
+        }
+
+        aliases = config.getStringList("ignoreCommandAliases");
+        if(aliases == null || aliases.isEmpty())aliases = Arrays.asList("ignore");
+        if(config.getBoolean("enableIgnoreCommand", true)) {
+			super.getProxy().getPluginManager().registerCommand(this, new IgnoreCommand(this, aliases.get(0), null,
+                    aliases.subList(1, aliases.size()).toArray(new String[aliases.size() - 1])));
 		}
     }
 

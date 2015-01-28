@@ -72,6 +72,27 @@ regex:
     - search: '<3'
       replace: "\u2764"
 
+# COMMANDS
+
+# /ignore allows players to ignore all kind of chat messages from another player
+enableIgnoreCommand: true
+ignoreCommandAliases: ['ignore']
+
+# private messages: /msg <player> and /reply ...
+enableMessageCommand: true
+messageCommandAliases: ['w', 'msg', 'message', 'tell', 'whisper']
+enableReplyCommand: true
+replyCommandAliases: ['reply', 'r']
+
+# command to write something in global chat; e.g. /g Hi there
+# normally the plugin treats all chat as global chat, so you wouldn't need this command
+enableGlobalChatCommand: true
+globalChatCommandAliases: ['global', 'g']
+
+# /freebungeechat allows admins to reload the plugin ingame
+enableAdminCommand: true
+adminCommandAliases: ['freebungeechat', 'fbc']
+
 ###########################################################
 # ONLY EDIT BELOW SETTINGS IF YOU KNOW WHAT YOU ARE DOING #
 ###########################################################
@@ -80,9 +101,6 @@ regex:
 # if this is set to false use /g for global chat
 # IF YOU DON'T KNOW WHAT THIS DOES DON'T CHANGE IT
 alwaysGlobalChat: true
-
-# should be self-explaining
-enableIgnoreCommand: true
 
 # exclude servers from global chat, players on these servers will not be able to send or receive global chat
 #excludeServers:
