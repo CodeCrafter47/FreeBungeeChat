@@ -32,6 +32,12 @@ regex:
       replace: "$0[hover=&b${cmd}]"
     - search: '\[/(?:url|command)\]'
       replace: "[/hover]$0"
+# make any pasted links clickable for convenience
+    - search: '(?<link>(?:(https?)://)?([-\w_\.]{2,}\.[a-z]{2,4})(/\S*)?)'
+      replace: "[url]${link}[/url]"
+# if players write commands in chat like ./command, make them clickable + remove the dot
+    - search: '^\.(?<cmd>/.{2,})'
+      replace: "[suggest]${cmd}[/suggest]"
 # some smileys
     - search: '--->'
       replace: "\u21DB"
