@@ -17,16 +17,15 @@
 package codecrafter47.freebungeechat;
 
 import codecrafter47.freebungeechat.bukkitbridge.Constants;
+import codecrafter47.freebungeechat.commands.*;
 import com.google.common.base.Charsets;
 import lombok.SneakyThrows;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ChatEvent;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.event.TabCompleteEvent;
-import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.config.Configuration;
@@ -35,10 +34,7 @@ import net.md_5.bungee.config.YamlConfiguration;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,12 +42,12 @@ import java.util.List;
 import java.util.Map;
 
 public class FreeBungeeChat extends Plugin implements Listener{
-    private final Map<String, String> replyTarget = new HashMap<>();
-	private final Map<String, List<String>> ignoredPlayers = new HashMap<>();
-    Configuration config;
+    public final Map<String, String> replyTarget = new HashMap<>();
+	public final Map<String, List<String>> ignoredPlayers = new HashMap<>();
+    public Configuration config;
     public static FreeBungeeChat instance;
 
-	List<String> excludedServers = new ArrayList<>();
+	public List<String> excludedServers = new ArrayList<>();
 
 	BukkitBridge bukkitBridge;
 
@@ -80,216 +76,18 @@ public class FreeBungeeChat extends Plugin implements Listener{
 
         super.getProxy().getPluginManager().registerListener(this, this);
 
-        super.getProxy().getPluginManager().registerCommand(this, new Command("freebungeechat", "freebungeechat.admin", "fbc") {
-            @Override
-            public void execute(CommandSender commandSender, String[] strings) {
-                if(strings.length == 1 && strings[0].equalsIgnoreCase("reload")){
-                    try {
-                        config = ConfigurationProvider.getProvider(YamlConfiguration.class).load(new InputStreamReader(new FileInputStream(new File(getDataFolder(), "config.yml")), Charsets.UTF_8));
-                        if(config.getStringList("excludeServers") != null){
-                            excludedServers = config.getStringList("excludeServers");
-                        }
-                        commandSender.sendMessage(ChatParser.parse("[color=blue][[color=red]FreeBungeeChat[/color]][/color] &aConfiguration has been reloaded."));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        commandSender.sendMessage(ChatParser.parse("[color=blue][[color=red]FreeBungeeChat[/color]][/color] &cThere has been an error while reloading the config. See the console for more details"));
-                    }
-                } else {
-                    commandSender.sendMessage(ChatParser.parse("[color=blue][[color=red]FreeBungeeChat[/color]][/color] &f[suggest]/freebungeechat reload[/suggest]"));
-                }
-            }
-        });
+        super.getProxy().getPluginManager().registerCommand(this, new ReloadCommand(this, "freebungeechat", "freebungeechat.admin", "fbc"));
 
-        super.getProxy().getPluginManager().registerCommand(this, new Command(
-                "whisper", null, "w", "msg", "message", "tell") {
+        super.getProxy().getPluginManager().registerCommand(this, new MessageCommand(this, "whisper", null, "w", "msg", "message", "tell"));
 
-            @Override
-            public void execute(CommandSender cs, String[] args) {
-                if (args.length < 1) {
-                    return;
-                }
-                ProxiedPlayer target = getProxy().getPlayer(args[0]);
-                ProxiedPlayer player = (ProxiedPlayer) cs;
-                if (target == null) {
-                    String text = config.getString("unknownTarget").replace(
-                            "%target%", wrapVariable(args[0]));
-                    player.sendMessage(ChatParser.parse(text));
-                    return;
-                }
-
-                String text = "";
-                for (int i = 1; i < args.length; i++) {
-                    text = text + args[i] + " ";
-                }
-
-				// check ignored
-				if(ignoredPlayers.get(target.getName()) != null && ignoredPlayers.get(target.getName()).contains(player.getName())){
-					text = config.getString("ignored").replace(
-                            "%target%", wrapVariable(args[0]));
-					player.sendMessage(ChatParser.parse(text));
-					return;
-				}
-
-                text = preparePlayerChat(text, player);
-				text = replaceRegex(text);
-
-                player.sendMessage(ChatParser.parse(
-                        config.getString("privateMessageSend").replace(
-                                "%target%", wrapVariable(target.
-                                        getDisplayName())).replace(
-                                "%player%", wrapVariable(player.
-                                        getDisplayName())).replace(
-                                "%message%", text)));
-
-                target.sendMessage(ChatParser.parse(
-                        config.getString("privateMessageReceive").replace(
-                                "%target%", wrapVariable(target.
-                                        getDisplayName())).replace(
-                                "%player%", wrapVariable(player.
-                                        getDisplayName())).replace(
-                                "%message%", text)));
-
-                replyTarget.put(target.getName(), player.getName());
-            }
-
-        });
-
-        super.getProxy().getPluginManager().registerCommand(this, new Command(
-                "reply", null, "r") {
-
-            @Override
-            public void execute(CommandSender cs, String[] args) {
-
-                ProxiedPlayer player = (ProxiedPlayer) cs;
-
-                ProxiedPlayer target = getReplyTarget(player);
-
-                if (target == null) {
-                    String text = config.getString("unknownTarget").replace(
-                            "%target%",
-                            wrapVariable(args[0]));
-                    player.sendMessage(ChatParser.parse(text));
-                    return;
-                }
-
-				// check ignored
-				if(ignoredPlayers.get(target.getName()) != null && ignoredPlayers.get(target.getName()).contains(player.getName())){
-					String text = config.getString("ignored").replace(
-                            "%target%",
-                            wrapVariable(args[0]));
-					player.sendMessage(ChatParser.parse(text));
-					return;
-				}
-
-                String text = "";
-                for (String arg : args) {
-                    text = text + arg + " ";
-                }
-
-                text = preparePlayerChat(text, player);
-				text = replaceRegex(text);
-
-                player.sendMessage(ChatParser.parse(
-                        replaceVariables(target, replaceVariables(player, config.getString("privateMessageSend").replace(
-                                "%target%", wrapVariable(target.
-                                        getDisplayName())).replace(
-                                "%player%", wrapVariable(player.
-                                        getDisplayName())).replace(
-                                "%message%", text), ""), "t")));
-
-                target.sendMessage(ChatParser.parse(
-                        replaceVariables(target, replaceVariables(player, config.getString("privateMessageReceive").replace(
-                                "%target%", wrapVariable(target.
-                                        getDisplayName())).replace(
-                                "%player%", wrapVariable(player.
-                                        getDisplayName())).replace(
-                                "%message%", text), ""), "t")));
-
-                replyTarget.put(target.getName(), player.getName());
-            }
-
-        });
+        super.getProxy().getPluginManager().registerCommand(this, new ReplyCommand(this, "reply", null, "r"));
 
         if(!config.getBoolean("alwaysGlobalChat", true)) {
-            super.getProxy().getPluginManager().registerCommand(this, new Command(
-                    "global", null, "g") {
-
-                @Override
-                public void execute(CommandSender cs, String[] args) {
-                    if(!(cs instanceof ProxiedPlayer)){
-                        cs.sendMessage("Only players can do this");
-                        return;
-                    }
-
-                    String message = "";
-                    for (String arg : args) {
-                        message = message + arg + " ";
-                    }
-
-                    message = preparePlayerChat(message, (ProxiedPlayer) cs);
-					message = replaceRegex(message);
-
-                    // replace variables
-                    String text = config.getString("chatFormat").replace("%player%",
-                            wrapVariable(((ProxiedPlayer) cs).getDisplayName()));
-                    text = text.replace("%message%", wrapVariable(message));
-					text = replaceVariables(((ProxiedPlayer) cs), text, "");
-
-                    // broadcast message
-                    BaseComponent[] msg = ChatParser.parse(text);
-					for(ProxiedPlayer target: getProxy().getPlayers()){
-						if(ignoredPlayers.get(target.getName()) != null && ignoredPlayers.get(target.getName()).contains(cs.getName()))continue;
-						if(target.getServer() == null || !excludedServers.contains(target.getServer().getInfo().getName()))target.sendMessage(msg);
-					}
-                }
-            });
+            super.getProxy().getPluginManager().registerCommand(this, new GlobalChatCommand(this, "global", null, "g"));
         }
 
 		if(config.getBoolean("enableIgnoreCommand", true)) {
-			super.getProxy().getPluginManager().registerCommand(this, new Command(
-					"ignore", null) {
-
-				@Override
-				public void execute(CommandSender cs, String[] args) {
-					if(!(cs instanceof ProxiedPlayer)){
-						cs.sendMessage("Only players can do this");
-						return;
-					}
-
-					if(args.length != 1){
-						cs.sendMessage("/ignore <player>");
-					}
-
-					ProxiedPlayer toIgnore = getProxy().getPlayer(args[0]);
-
-					if(toIgnore == null){
-						String text = config.getString("unknownTarget").replace(
-                                "%target%",
-                                wrapVariable(args[0]));
-						cs.sendMessage(ChatParser.parse(text));
-						return;
-					}
-
-					// add player to ignore list
-					List<String> ignoreList = ignoredPlayers.get(cs.getName());
-					if(ignoreList == null) ignoreList = new ArrayList<>(1);
-					if(!ignoreList.contains(toIgnore.getName())) {
-						ignoreList.add(toIgnore.getName());
-						String text = config.getString("ignoreSuccess").replace(
-                                "%target%",
-                                wrapVariable(args[0]));
-						cs.sendMessage(ChatParser.parse(text));
-					}
-					else {
-						ignoreList.remove(toIgnore.getName());
-						String text = config.getString("ignoreUnignore").replace(
-                                "%target%",
-                                wrapVariable(args[0]));
-						cs.sendMessage(ChatParser.parse(text));
-					}
-					ignoredPlayers.put(cs.getName(), ignoreList);
-				}
-			});
+			super.getProxy().getPluginManager().registerCommand(this, new IgnoreCommand(this, "ignore", null));
 		}
     }
 
@@ -339,7 +137,7 @@ public class FreeBungeeChat extends Plugin implements Listener{
 		if(ignoredPlayers.containsKey(name))ignoredPlayers.remove(name);
     }
 
-    private ProxiedPlayer getReplyTarget(ProxiedPlayer player) {
+    public ProxiedPlayer getReplyTarget(ProxiedPlayer player) {
         String t = replyTarget.get(player.getName());
         if (t == null) {
             return player;
@@ -374,7 +172,7 @@ public class FreeBungeeChat extends Plugin implements Listener{
         }
     }
 
-	private String replaceVariables(ProxiedPlayer player, String text, String prefix){
+	public String replaceVariables(ProxiedPlayer player, String text, String prefix){
 		text = text.replace("%" + prefix + "group%", wrapVariable(bukkitBridge.getPlayerInformation(player, "group")));
 		text = text.replace("%" + prefix + "prefix%", wrapVariable(bukkitBridge.getPlayerInformation(player, "prefix")));
 		text = text.replace("%" + prefix + "suffix%", wrapVariable(bukkitBridge.getPlayerInformation(player, "suffix")));
@@ -391,7 +189,7 @@ public class FreeBungeeChat extends Plugin implements Listener{
         return text;
 	}
 
-	private String replaceRegex(String str){
+	public String replaceRegex(String str){
 		List list = config.getList("regex");
 		if(list == null)return str;
 		for(Object entry: list){
@@ -401,7 +199,7 @@ public class FreeBungeeChat extends Plugin implements Listener{
 		return str;
 	}
 
-    private String wrapVariable(String variable){
+    public String wrapVariable(String variable){
         if(config.getBoolean("allowBBCodeInVariables", false)){
             return variable;
         } else {
@@ -409,7 +207,7 @@ public class FreeBungeeChat extends Plugin implements Listener{
         }
     }
 
-    private String preparePlayerChat(String text, ProxiedPlayer player){
+    public String preparePlayerChat(String text, ProxiedPlayer player){
         if(!player.hasPermission("freebungeechat.chat.color")){
             text = ChatColor.translateAlternateColorCodes('&', text);
             text = ChatColor.stripColor(text);
@@ -419,4 +217,12 @@ public class FreeBungeeChat extends Plugin implements Listener{
         }
         return text;
     }
+
+    public void reloadConfig() throws FileNotFoundException {
+        config = ConfigurationProvider.getProvider(YamlConfiguration.class).load(new InputStreamReader(new FileInputStream(new File(getDataFolder(), "config.yml")), Charsets.UTF_8));
+        if(config.getStringList("excludeServers") != null){
+            excludedServers = config.getStringList("excludeServers");
+        }
+    }
+
 }
