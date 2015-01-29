@@ -102,6 +102,7 @@ adminCommandAliases: ['freebungeechat', 'fbc']
 
 # whether to treat all chat as global chat
 # if this is set to false use /g for global chat
+# if you also disable /g you have disabled global chat completely
 # IF YOU DON'T KNOW WHAT THIS DOES DON'T CHANGE IT
 alwaysGlobalChat: true
 
