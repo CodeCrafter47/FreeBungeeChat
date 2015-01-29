@@ -33,6 +33,7 @@ public class GlobalChatCommand extends Command {
 
         message = plugin.preparePlayerChat(message, (ProxiedPlayer) cs);
         message = plugin.replaceRegex(message);
+        message = plugin.applyTagLogic(message);
 
         // replace variables
         String text = plugin.config.getString("chatFormat").replace("%player%",

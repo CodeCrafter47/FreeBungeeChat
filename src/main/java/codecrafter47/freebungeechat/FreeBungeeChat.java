@@ -37,6 +37,8 @@ import net.md_5.bungee.event.EventPriority;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class FreeBungeeChat extends Plugin implements Listener{
     public final Map<String, String> replyTarget = new HashMap<>();
@@ -132,6 +134,7 @@ public class FreeBungeeChat extends Plugin implements Listener{
 
         message = preparePlayerChat(message, (ProxiedPlayer) event.getSender());
 		message = replaceRegex(message);
+        message = applyTagLogic(message);
 
         // replace variables
         String text = config.getString("chatFormat").replace("%player%",
@@ -243,6 +246,26 @@ public class FreeBungeeChat extends Plugin implements Listener{
         if(config.getStringList("excludeServers") != null){
             excludedServers = config.getStringList("excludeServers");
         }
+    }
+
+    public String applyTagLogic(String text){
+        if(!config.getBoolean("enableTaggingPlayers", true))return text;
+        Matcher matcher = Pattern.compile("@(?<name>[^ ]{1,16})").matcher(text);
+        StringBuffer stringBuffer = new StringBuffer(text.length());
+        while (matcher.find()){
+            String name = matcher.group("name");
+            ProxiedPlayer taggedPlayer = getProxy().getPlayer(name);
+            if(taggedPlayer != null){
+                matcher.appendReplacement(stringBuffer, config.getString("taggedPlayer", "[suggest=/w ${name}]@${name}[/suggest]"));
+                if(config.getBoolean("playSoundToTaggedPlayer", true)){
+                    bukkitBridge.playSound(taggedPlayer, config.getString("playerTaggedSound", "ORB_PICKUP"));
+                }
+            } else {
+                matcher.appendReplacement(stringBuffer, "$0");
+            }
+        }
+        matcher.appendTail(stringBuffer);
+        return stringBuffer.toString();
     }
 
 }

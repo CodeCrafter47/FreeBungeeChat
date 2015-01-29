@@ -22,11 +22,14 @@ privateMessageReceive: '&b[suggest=/w %player% ]%player% -> me[/suggest] &f> [i]
 # whether to underline everything that is clickable or has a hover effect
 underlineLinks: true
 
+# @mentioning players
+enableTaggingPlayers: true
+taggedPlayer: "[color=gold][suggest=/w ${name}]@${name}[/suggest][/color]"
+playSoundToTaggedPlayer: true
+playerTaggedSound: ORB_PICKUP
+
 # you can add custom regular expressions here
 regex:
-# allows tagging players with @player
-    - search: "@(?<name>[^ ]{1,16})"
-      replace: "[suggest=/w ${name}]@${name}[/suggest]"
 # shows link target in tooltip for security reasons (only if link target differs from shown text)
     - search: '\[(?:url|command)=(?<cmd>(?:(?:[^]\[]*)\[(?:[^]\[]*)\])*(?:[^]\[]*))\]'
       replace: "$0[hover=&b${cmd}]"

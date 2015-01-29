@@ -21,6 +21,7 @@ import codecrafter47.freebungeechat.bukkitbridge.api.PlayerInformationProvider;
 import codecrafter47.freebungeechat.bukkitbridge.informationhooks.BukkitHook;
 import codecrafter47.freebungeechat.bukkitbridge.informationhooks.VaultHook;
 import org.bukkit.ChatColor;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -78,6 +79,9 @@ public class BukkitBridge extends JavaPlugin implements Listener {
 							if (subchannel.equals(
 									Constants.subchannel_initplayer)) {
 								addPlayer(player);
+							}
+							if (subchannel.equalsIgnoreCase(Constants.subchannel_playSound)){
+								player.playSound(player.getLocation(), Sound.valueOf(in.readUTF()), 5, 1);
 							}
 						}
 						catch (IOException ex) {

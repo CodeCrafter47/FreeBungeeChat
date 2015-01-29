@@ -32,6 +32,8 @@ public class Constants {
 
     public final static String subchannel_updateplayer = "updateplayer";
 
+    public final static String subchannel_playSound = "playsound";
+
     public final static int updateDelay = 10;
 
     public final static int completeUpdateDelay = 6000;

@@ -39,7 +39,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
  * @author Florian Stober
  */
 public class BukkitBridge implements Listener {
@@ -112,7 +111,7 @@ public class BukkitBridge implements Listener {
                             for (Entry<String, String> entry : data.entrySet()) {
                                 serverInformation.get(server.getInfo().
                                         getName()).put(entry.getKey(), entry.
-                                                getValue());
+                                        getValue());
                             }
                         }
                     } else if (subchannel.
@@ -133,7 +132,7 @@ public class BukkitBridge implements Listener {
                     } else {
                         plugin.getLogger().log(Level.SEVERE,
                                 "BukkitBridge on server " + server.getInfo().
-                                getName() + " send an unknown packet! Is everything up-to-date?");
+                                        getName() + " send an unknown packet! Is everything up-to-date?");
                     }
 
                 } catch (IOException ex) {
@@ -163,7 +162,7 @@ public class BukkitBridge implements Listener {
     }
 
     private void requestInformationIn200Millis(final ProxiedPlayer player,
-            final int tries) {
+                                               final int tries) {
         if (tries > 50) {
             return;
         }
@@ -212,7 +211,7 @@ public class BukkitBridge implements Listener {
         if (map == null) {
             return "unknown";
         }
-		if (!map.containsKey(key))return "unknown";
+        if (!map.containsKey(key)) return "unknown";
         return map.get(key);
     }
 
@@ -222,5 +221,20 @@ public class BukkitBridge implements Listener {
 
     public boolean isPlayerInformationAvailable(ProxiedPlayer player) {
         return playerInformation.get(player.getName()) != null;
+    }
+
+    public void playSound(ProxiedPlayer player, String sound) {
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            DataOutputStream outputStream1 = new DataOutputStream(outputStream);
+            outputStream1.writeUTF(Constants.subchannel_playSound);
+            outputStream1.writeUTF(sound);
+            outputStream1.flush();
+            outputStream1.close();
+            player.getServer().sendData(Constants.channel, outputStream.toByteArray());
+        } catch (IOException ex) {
+            Logger.getLogger(BukkitBridge.class.getName()).
+                    log(Level.SEVERE, null, ex);
+        }
     }
 }
