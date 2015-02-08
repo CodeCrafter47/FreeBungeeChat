@@ -1,5 +1,5 @@
 name: FreeBungeeChat
-main: codecrafter47.freebungeechat.bukkitbridge.BukkitBridge
+main: codecrafter47.freebungeechat.bukkit.FreeBungeeChatBukkit
 version: 2.0
 authors:
   - CodeCrafter47

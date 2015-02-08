@@ -14,15 +14,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package codecrafter47.freebungeechat.bukkitbridge.api;
-
-import java.util.Map;
+package codecrafter47.freebungeechat.bukkit;
 
 /**
  *
  * @author Florian Stober
  */
-public interface GeneralInformationProvider {
+public class Constants {
 
-    Map<String, Object> getInformation();
+    public final static String channel = "FreeBungeeChat";
+
+    public final static String subchannel_init = "init";
+
+    public final static String subchannel_initplayer = "initplayer";
+
+    public final static String subchannel_update = "update";
+
+    public final static String subchannel_updateplayer = "updateplayer";
+
+    public final static String subchannel_playSound = "playsound";
+
+    public final static String subchannel_chatMsg = "chat";
+
+    public final static int updateDelay = 10;
+
+    public final static int completeUpdateDelay = 6000;
+
 }

@@ -19,11 +19,11 @@ public class ReplyCommand extends Command {
     }
 
     @Override
-    public void execute(CommandSender cs, String[] args) {
+    public void execute(CommandSender cs, final String[] args) {
 
-        ProxiedPlayer player = (ProxiedPlayer) cs;
+        final ProxiedPlayer player = (ProxiedPlayer) cs;
 
-        ProxiedPlayer target = plugin.getReplyTarget(player);
+        final ProxiedPlayer target = plugin.getReplyTarget(player);
 
         if (target == null) {
             String text = plugin.config.getString("unknownTarget").replace(
@@ -42,31 +42,36 @@ public class ReplyCommand extends Command {
             return;
         }
 
-        String text = "";
-        for (String arg : args) {
-            text = text + arg + " ";
-        }
+        plugin.getProxy().getScheduler().runAsync(plugin, new Runnable() {
+            @Override
+            public void run() {
+                String text = "";
+                for (String arg : args) {
+                    text = text + arg + " ";
+                }
 
-        text = plugin.preparePlayerChat(text, player);
-        text = plugin.replaceRegex(text);
+                text = plugin.preparePlayerChat(text, player);
+                text = plugin.replaceRegex(text);
 
-        player.sendMessage(ChatParser.parse(
-                plugin.replaceVariables(target, plugin.replaceVariables(player, plugin.config.getString("privateMessageSend").replace(
-                        "%target%", plugin.wrapVariable(target.
-                                getDisplayName())).replace(
-                        "%player%", plugin.wrapVariable(player.
-                                getDisplayName())).replace(
-                        "%message%", text), ""), "t")));
+                player.sendMessage(ChatParser.parse(
+                        plugin.bukkitBridge.replaceVariables(target, plugin.bukkitBridge.replaceVariables(player, plugin.config.getString("privateMessageSend").replace(
+                                "%target%", plugin.wrapVariable(target.
+                                        getDisplayName())).replace(
+                                "%player%", plugin.wrapVariable(player.
+                                        getDisplayName())).replace(
+                                "%message%", text), ""), "t")));
 
-        target.sendMessage(ChatParser.parse(
-                plugin.replaceVariables(target, plugin.replaceVariables(player, plugin.config.getString("privateMessageReceive").replace(
-                        "%target%", plugin.wrapVariable(target.
-                                getDisplayName())).replace(
-                        "%player%", plugin.wrapVariable(player.
-                                getDisplayName())).replace(
-                        "%message%", text), ""), "t")));
+                target.sendMessage(ChatParser.parse(
+                        plugin.bukkitBridge.replaceVariables(target, plugin.bukkitBridge.replaceVariables(player, plugin.config.getString("privateMessageReceive").replace(
+                                "%target%", plugin.wrapVariable(target.
+                                        getDisplayName())).replace(
+                                "%player%", plugin.wrapVariable(player.
+                                        getDisplayName())).replace(
+                                "%message%", text), ""), "t")));
 
-        plugin.replyTarget.put(target.getName(), player.getName());
+                plugin.replyTarget.put(target.getName(), player.getName());
+            }
+        });
     }
 
 }

@@ -20,32 +20,37 @@ public class GlobalChatCommand extends Command {
     }
 
     @Override
-    public void execute(CommandSender cs, String[] args) {
+    public void execute(final CommandSender cs, final String[] args) {
         if(!(cs instanceof ProxiedPlayer)){
             cs.sendMessage("Only players can do this");
             return;
         }
 
-        String message = "";
-        for (String arg : args) {
-            message = message + arg + " ";
-        }
+        plugin.getProxy().getScheduler().runAsync(plugin, new Runnable() {
+            @Override
+            public void run() {
+                String message = "";
+                for (String arg : args) {
+                    message = message + arg + " ";
+                }
 
-        message = plugin.preparePlayerChat(message, (ProxiedPlayer) cs);
-        message = plugin.replaceRegex(message);
-        message = plugin.applyTagLogic(message);
+                message = plugin.preparePlayerChat(message, (ProxiedPlayer) cs);
+                message = plugin.replaceRegex(message);
+                message = plugin.applyTagLogic(message);
 
-        // replace variables
-        String text = plugin.config.getString("chatFormat").replace("%player%",
-                plugin.wrapVariable(((ProxiedPlayer) cs).getDisplayName()));
-        text = text.replace("%message%", plugin.wrapVariable(message));
-        text = plugin.replaceVariables(((ProxiedPlayer) cs), text, "");
+                // replace variables
+                String text = plugin.config.getString("chatFormat").replace("%player%",
+                        plugin.wrapVariable(((ProxiedPlayer) cs).getDisplayName()));
+                text = text.replace("%message%", plugin.wrapVariable(message));
+                text = plugin.bukkitBridge.replaceVariables(((ProxiedPlayer) cs), text, "");
 
-        // broadcast message
-        BaseComponent[] msg = ChatParser.parse(text);
-        for(ProxiedPlayer target: plugin.getProxy().getPlayers()){
-            if(plugin.ignoredPlayers.get(target.getName()) != null && plugin.ignoredPlayers.get(target.getName()).contains(cs.getName()))continue;
-            if(target.getServer() == null || !plugin.excludedServers.contains(target.getServer().getInfo().getName()))target.sendMessage(msg);
-        }
+                // broadcast message
+                BaseComponent[] msg = ChatParser.parse(text);
+                for(ProxiedPlayer target: plugin.getProxy().getPlayers()){
+                    if(plugin.ignoredPlayers.get(target.getName()) != null && plugin.ignoredPlayers.get(target.getName()).contains(cs.getName()))continue;
+                    if(target.getServer() == null || !plugin.excludedServers.contains(target.getServer().getInfo().getName()))target.sendMessage(msg);
+                }
+            }
+        });
     }
 }

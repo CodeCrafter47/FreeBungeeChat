@@ -18,23 +18,17 @@
  */
 package codecrafter47.freebungeechat;
 
-import codecrafter47.freebungeechat.bukkitbridge.Constants;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.config.ServerInfo;
+import codecrafter47.freebungeechat.bukkit.Constants;
+import lombok.SneakyThrows;
+import lombok.Synchronized;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
-import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.event.PluginMessageEvent;
-import net.md_5.bungee.api.event.ServerConnectedEvent;
-import net.md_5.bungee.api.event.ServerKickEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 
 import java.io.*;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -43,39 +37,17 @@ import java.util.logging.Logger;
  */
 public class BukkitBridge implements Listener {
 
-    byte[] Cinit, Cinit_player;
-
     FreeBungeeChat plugin;
 
-    Map<String, Map<String, String>> serverInformation;
-    Map<String, Map<String, String>> playerInformation;
+    ConcurrentHashMap<Integer, String> buf = new ConcurrentHashMap<>();
+
+    int cnt = 0;
 
     public BukkitBridge(FreeBungeeChat plugin) {
         this.plugin = plugin;
-
-        try {
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            DataOutputStream out = new DataOutputStream(os);
-            out.writeUTF(Constants.subchannel_init);
-            Cinit = os.toByteArray();
-        } catch (IOException ex) {
-            Logger.getLogger(BukkitBridge.class.getName()).
-                    log(Level.SEVERE, null, ex);
-        }
-        try {
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            DataOutputStream out = new DataOutputStream(os);
-            out.writeUTF(Constants.subchannel_initplayer);
-            Cinit_player = os.toByteArray();
-        } catch (IOException ex) {
-            Logger.getLogger(BukkitBridge.class.getName()).
-                    log(Level.SEVERE, null, ex);
-        }
     }
 
     public void enable() {
-        serverInformation = new ConcurrentHashMap<>();
-        playerInformation = new ConcurrentHashMap<>();
         plugin.getProxy().getPluginManager().registerListener(plugin, this);
     }
 
@@ -87,52 +59,14 @@ public class BukkitBridge implements Listener {
                     getSender() instanceof Server) {
                 try {
                     ProxiedPlayer player = (ProxiedPlayer) event.getReceiver();
-                    Server server = (Server) event.getSender();
 
                     DataInputStream in = new DataInputStream(
                             new ByteArrayInputStream(event.getData()));
 
                     String subchannel = in.readUTF();
 
-                    Map<String, String> data = new ConcurrentHashMap<>();
-                    int num = in.readInt();
-                    while (num-- > 0) {
-                        String key = in.readUTF();
-                        String value = in.readUTF();
-                        data.put(key, value);
-                    }
-
-                    if (subchannel.equals(Constants.subchannel_init)) {
-                        serverInformation.put(server.getInfo().getName(), data);
-                    } else if (subchannel.equals(Constants.subchannel_update)) {
-                        if (serverInformation.get(server.getInfo().getName()) == null) {
-                            server.sendData(Constants.channel, Cinit);
-                        } else {
-                            for (Entry<String, String> entry : data.entrySet()) {
-                                serverInformation.get(server.getInfo().
-                                        getName()).put(entry.getKey(), entry.
-                                        getValue());
-                            }
-                        }
-                    } else if (subchannel.
-                            equals(Constants.subchannel_initplayer)) {
-                        playerInformation.put(player.getName(), data);
-                        data.put("server", server.getInfo().getName());
-                    } else if (subchannel.equals(
-                            Constants.subchannel_updateplayer)) {
-                        if (playerInformation.get(player.getName()) == null) {
-                            player.getServer().sendData(Constants.channel,
-                                    Cinit_player);
-                        } else {
-                            for (Entry<String, String> entry : data.entrySet()) {
-                                playerInformation.get(player.getName()).put(
-                                        entry.getKey(), entry.getValue());
-                            }
-                        }
-                    } else {
-                        plugin.getLogger().log(Level.SEVERE,
-                                "BukkitBridge on server " + server.getInfo().
-                                        getName() + " send an unknown packet! Is everything up-to-date?");
+                    if(subchannel.equals(Constants.subchannel_chatMsg)){
+                        buf.put(in.readInt(), in.readUTF());
                     }
 
                 } catch (IOException ex) {
@@ -141,86 +75,6 @@ public class BukkitBridge implements Listener {
                 }
             }
         }
-    }
-
-    @EventHandler
-    public void onServerChange(ServerConnectedEvent event) {
-        final ProxiedPlayer player = event.getPlayer();
-
-        if (playerInformation.get(player.getName()) != null) {
-            playerInformation.remove(player.getName());
-        }
-
-        ProxyServer.getInstance().getScheduler().
-                schedule(plugin,
-                        new Runnable() {
-                            @Override
-                            public void run() {
-                                requestInformationIn200Millis(player, 1);
-                            }
-                        }, 5, TimeUnit.MILLISECONDS);
-    }
-
-    private void requestInformationIn200Millis(final ProxiedPlayer player,
-                                               final int tries) {
-        if (tries > 50) {
-            return;
-        }
-        if (playerInformation.get(player.
-                getName()) != null) {
-            return;
-        }
-        if (player.getServer() != null) {
-            player.getServer().sendData(
-                    Constants.channel,
-                    Cinit_player);
-        }
-
-        ProxyServer.getInstance().getScheduler().
-                schedule(plugin,
-                        new Runnable() {
-                            @Override
-                            public void run() {
-                                requestInformationIn200Millis(player, tries + 1);
-                            }
-                        }, 200, TimeUnit.MILLISECONDS);
-    }
-
-    @EventHandler
-    public void onPlayerDisconnect(PlayerDisconnectEvent event) {
-        ProxiedPlayer player = event.getPlayer();
-        playerInformation.remove(player.getName());
-    }
-
-    @EventHandler
-    public void onPlayerKick(ServerKickEvent event) {
-        ProxiedPlayer player = event.getPlayer();
-        playerInformation.remove(player.getName());
-    }
-
-    public String getServerInformation(ServerInfo server, String key) {
-        Map<String, String> map = serverInformation.get(server.getName());
-        if (map == null) {
-            return null;
-        }
-        return map.get(key);
-    }
-
-    public String getPlayerInformation(ProxiedPlayer player, String key) {
-        Map<String, String> map = playerInformation.get(player.getName());
-        if (map == null) {
-            return "unknown";
-        }
-        if (!map.containsKey(key)) return "unknown";
-        return map.get(key);
-    }
-
-    public boolean isServerInformationAvailable(ServerInfo server) {
-        return serverInformation.get(server.getName()) != null;
-    }
-
-    public boolean isPlayerInformationAvailable(ProxiedPlayer player) {
-        return playerInformation.get(player.getName()) != null;
     }
 
     public void playSound(ProxiedPlayer player, String sound) {
@@ -236,5 +90,50 @@ public class BukkitBridge implements Listener {
             Logger.getLogger(BukkitBridge.class.getName()).
                     log(Level.SEVERE, null, ex);
         }
+    }
+
+    @SneakyThrows
+    public String replaceVariables(ProxiedPlayer player, String text, String prefix) {
+        int tries = 0;
+        while(text.matches("^.*%" + prefix + "(group|prefix|suffix|balance|currency|currencyPl|tabName|displayName|world|health|level)%.*$")
+                && tries < 3){
+            try{
+                int id = getId();
+                if(buf.containsKey(id))buf.remove(id);
+                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                DataOutputStream outputStream1 = new DataOutputStream(outputStream);
+                outputStream1.writeUTF(Constants.subchannel_chatMsg);
+                outputStream1.writeUTF(text);
+                outputStream1.writeUTF(prefix);
+                outputStream1.writeInt(id);
+                outputStream1.writeBoolean(plugin.config.getBoolean("allowBBCodeInVariables", false));
+                outputStream1.flush();
+                outputStream1.close();
+                player.getServer().sendData(Constants.channel, outputStream.toByteArray());
+                for(int i = 0; i < 10 && !buf.containsKey(id); i++){
+                    Thread.sleep(100);
+                }
+                if(buf.containsKey(id)){
+                    text = buf.get(id);
+                    buf.remove(id);
+                    tries = 0;
+                    break;
+                }
+            } catch (Throwable th){
+                th.printStackTrace();
+                Thread.sleep(1000);
+            }
+            tries++;
+        }
+        if(tries > 0){
+            throw new RuntimeException("Unable to process chat message from " + player.getName() + " make sure you have installed FreeBungeeChat on " + (player.getServer() != null ? player.getServer().getInfo().getName() : "(unknown server)"));
+        }
+        text = text.replace("%" + prefix + "server%", plugin.wrapVariable(player.getServer() != null ? player.getServer().getInfo().getName() : "unknown"));
+        return text;
+    }
+
+    @Synchronized
+    private int getId() {
+        return cnt++;
     }
 }

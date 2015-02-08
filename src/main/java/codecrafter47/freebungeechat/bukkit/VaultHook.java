@@ -14,10 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package codecrafter47.freebungeechat.bukkitbridge.informationhooks;
+package codecrafter47.freebungeechat.bukkit;
 
-import codecrafter47.freebungeechat.bukkitbridge.BukkitBridge;
-import codecrafter47.freebungeechat.bukkitbridge.api.PlayerInformationProvider;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
@@ -25,18 +23,15 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  *
  * @author Florian Stober
  */
-public class VaultHook implements PlayerInformationProvider {
+public class VaultHook {
 
-    BukkitBridge plugin;
+    FreeBungeeChatBukkit plugin;
 
-    public VaultHook(BukkitBridge plugin) {
+    public VaultHook(FreeBungeeChatBukkit plugin) {
         this.plugin = plugin;
         setupPermissions();
         setupChat();
@@ -79,36 +74,48 @@ public class VaultHook implements PlayerInformationProvider {
         return (economy != null);
     }
 
-    @Override
-    public Map<String, Object> getInformation(Player player) {
-		if(permission == null)setupPermissions();
-		if(chat == null)setupChat();
-		if(economy == null)setupEconomy();
-        Map<String, Object> map = new HashMap<>();
+    public String getGroup(Player player){
         try {
-            if (permission != null && permission.hasGroupSupport() && permission.getPrimaryGroup(player) != null) {
-                map.put("group", permission.getPrimaryGroup(player));
+            if (permission != null && permission.getPrimaryGroup(player) != null) {
+                return permission.getPrimaryGroup(player);
             }
-        } catch (Throwable th) {
-            plugin.reportError(th);
+        } catch (UnsupportedOperationException ignored){
         }
-        try {
-            if (chat != null) {
-                map.put("prefix", chat.getPlayerPrefix(player));
-                map.put("suffix", chat.getPlayerSuffix(player));
-            }
-        } catch (Throwable th) {
-            plugin.reportError(th);
+        return "unknown";
+    }
+
+    public String getPrefix(Player player){
+        if(chat != null){
+            return chat.getPlayerPrefix(player);
         }
-        try {
-            if (economy != null) {
-                map.put("balance", economy.getBalance(player.getName()));
-                map.put("currency", economy.currencyNameSingular());
-                map.put("currencyPl", economy.currencyNamePlural());
-            }
-        } catch (Throwable th) {
-            plugin.reportError(th);
+        return "unknown";
+    }
+
+    public String getSuffix(Player player){
+        if(chat != null){
+            return chat.getPlayerSuffix(player);
         }
-        return map;
+        return "unknown";
+    }
+
+    public String getBalance(Player player){
+        if(economy != null){
+            return Double.toString(economy.getBalance(player.getName()));
+        }
+        return "-";
+    }
+
+    public String getCurrencyName(){
+        if(economy != null){
+            return economy.currencyNameSingular();
+        }
+        return "$";
+    }
+
+    public String getCurrencyNamePl(){
+        if(economy != null){
+            return economy.currencyNamePlural();
+        }
+        return "$";
     }
 }
