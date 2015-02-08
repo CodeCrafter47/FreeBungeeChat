@@ -19,9 +19,6 @@ privateMessageSend: "&b[suggest=/w %target% ]You -> %target%[/suggest]&f > [i]%m
 # you can use %player% and %target%
 privateMessageReceive: "&b[suggest=/w %player% ]%player% -> me[/suggest] &f> [i]%message%[/i]"
 
-# whether to underline everything that is clickable or has a hover effect
-underlineLinks: true
-
 # @mentioning players
 enableTaggingPlayers: true
 taggedPlayer: "[color=gold][suggest=/w ${name}]@${name}[/suggest][/color]"
@@ -74,6 +71,11 @@ regex:
       replace: "\u263B"
     - search: '<3'
       replace: "\u2764"
+# underline clickable things
+    - search: '\[(?:url|command|suggest)(?:=(?<cmd>(?:(?:[^]\[]*)\[(?:[^]\[]*)\])*(?:[^]\[]*)))?\]'
+      replace: "$0[u]"
+    - search: '\[/(?:url|command|suggest)\]'
+      replace: "[/u]$0"
 
 # COMMANDS
 
