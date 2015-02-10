@@ -98,6 +98,12 @@ globalChatCommandAliases: ['global', 'g']
 enableAdminCommand: true
 adminCommandAliases: ['freebungeechat', 'fbc']
 
+# conversation command
+# /chat CodeCrafter47 allows you to have a private chat with me
+# This saves you from typing /w CodeCrafter47 ... every time
+enableConversationCommand: true
+conversationCommandAliases: ['chat', 'conversation']
+
 ###########################################################
 # ONLY EDIT BELOW SETTINGS IF YOU KNOW WHAT YOU ARE DOING #
 ###########################################################
