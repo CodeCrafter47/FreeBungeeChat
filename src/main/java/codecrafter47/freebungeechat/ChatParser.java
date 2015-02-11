@@ -193,6 +193,7 @@ public class ChatParser {
                 // [url=....]
                 if(group_tag.matches("(?i)^url=.*$")){
                     String url = group_value;
+                    url = url.replaceAll("(?i)\\[/?nobbcode\\]", "");
                     if(!url.startsWith("http")){
                         url = "http://" + url;
                     }
@@ -213,6 +214,7 @@ public class ChatParser {
                 }
                 // [command=....]
                 if(group_tag.matches("(?i)^command=.*")){
+                    group_value = group_value.replaceAll("(?i)\\[/?nobbcode\\]", "");
                     ClickEvent clickEvent = new ClickEvent(ClickEvent.Action.RUN_COMMAND, group_value);
                     clickEventDeque.push(clickEvent);
                     current.setClickEvent(clickEvent);
@@ -220,6 +222,7 @@ public class ChatParser {
                 }
                 // [suggest=....]
                 if(group_tag.matches("(?i)^suggest=.*")){
+                    group_value = group_value.replaceAll("(?i)\\[/?nobbcode\\]", "");
                     ClickEvent clickEvent = new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, group_value);
                     clickEventDeque.push(clickEvent);
                     current.setClickEvent(clickEvent);
@@ -227,7 +230,18 @@ public class ChatParser {
                 }
                 // [hover=....]...[/hover]
                 if(group_tag.matches("(?i)^hover=.*$")){
-                    HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, parse(group_value));
+                    BaseComponent[] components1 = parse(group_value);
+                    if(!hoverEventDeque.isEmpty()){
+                        // why is there no apache commons lib in bungee
+                        BaseComponent[] components2 = hoverEventDeque.getLast().getValue();
+                        BaseComponent[] components3 = new BaseComponent[components1.length + components2.length + 1];
+                        int i = 0;
+                        for(BaseComponent baseComponent: components2)components3[i++] = baseComponent;
+                        components3[i++] = new TextComponent("\n");
+                        for(BaseComponent baseComponent: components1)components3[i++] = baseComponent;
+                        components1 = components3;
+                    }
+                    HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, components1);
                     hoverEventDeque.push(hoverEvent);
                     current.setHoverEvent(hoverEvent);
                     parsed = true;

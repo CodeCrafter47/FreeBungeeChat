@@ -27,16 +27,16 @@ playerTaggedSound: ORB_PICKUP
 
 # you can add custom regular expressions here
 regex:
-# shows link target in tooltip for security reasons (only if link target differs from shown text)
-    - search: '\[(?:url|command)=(?<cmd>(?:(?:[^]\[]*)\[(?:[^]\[]*)\])*(?:[^]\[]*))\]'
-      replace: "$0[hover=&b${cmd}]"
-    - search: '\[/(?:url|command)\]'
-      replace: "[/hover]$0"
 # make any pasted links clickable for convenience
     - search: '(?<link>(?:(https?)://)?([-\w_\.]{2,}\.[a-z]{2,4})(/\S*)?)'
       replace: "[url]${link}[/url]"
+# shows link target in tooltip for security reasons (only if link target differs from shown text)
+    - search: '(?i)\[(?:url|command)=(?<cmd>(?:(?:[^]\[]*)\[(?:[^]\[]*)\])*(?:[^]\[]*))\]'
+      replace: "[hover=&b${cmd}]$0"
+    - search: '(?i)\[/(?:url|command)\]'
+      replace: "$0[/hover]"
 # if players write commands in chat like ./command, make them clickable + remove the dot
-    - search: '^\.(?<cmd>/.{2,})'
+    - search: '(?i)^\.(?<cmd>/.{2,})'
       replace: "[suggest]${cmd}[/suggest]"
 # some smileys
     - search: '--->'
@@ -72,10 +72,10 @@ regex:
     - search: '<3'
       replace: "\u2764"
 # underline clickable things
-    - search: '\[(?:url|command|suggest)(?:=(?<cmd>(?:(?:[^]\[]*)\[(?:[^]\[]*)\])*(?:[^]\[]*)))?\]'
-      replace: "$0[u]"
-    - search: '\[/(?:url|command|suggest)\]'
-      replace: "[/u]$0"
+    - search: '(?i)(?=(\[(?:url|command|suggest)(?:=(?<cmd>(?:(?:[^]\[]*)\[(?:[^]\[]*)\])*(?:[^]\[]*)))?\]))'
+      replace: "[u]"
+    - search: '(?i)\[/(?:url|command|suggest)\]'
+      replace: "$0[/u]"
 
 # COMMANDS
 
