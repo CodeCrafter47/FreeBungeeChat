@@ -1,9 +1,7 @@
 package codecrafter47.freebungeechat.commands;
 
-import codecrafter47.freebungeechat.ChatParser;
 import codecrafter47.freebungeechat.FreeBungeeChat;
 import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 
@@ -26,30 +24,21 @@ public class GlobalChatCommand extends Command {
             return;
         }
 
+        String message = "";
+        for (String arg : args) {
+            message = message + arg + " ";
+        }
+
+        if(message.isEmpty()){
+            plugin.endConversation((ProxiedPlayer) cs, false);
+            return;
+        }
+
+        final String finalMessage = message;
         plugin.getProxy().getScheduler().runAsync(plugin, new Runnable() {
             @Override
             public void run() {
-                String message = "";
-                for (String arg : args) {
-                    message = message + arg + " ";
-                }
-
-                message = plugin.preparePlayerChat(message, (ProxiedPlayer) cs);
-                message = plugin.replaceRegex(message);
-                message = plugin.applyTagLogic(message);
-
-                // replace variables
-                String text = plugin.config.getString("chatFormat").replace("%player%",
-                        plugin.wrapVariable(((ProxiedPlayer) cs).getDisplayName()));
-                text = text.replace("%message%", plugin.wrapVariable(message));
-                text = plugin.bukkitBridge.replaceVariables(((ProxiedPlayer) cs), text, "");
-
-                // broadcast message
-                BaseComponent[] msg = ChatParser.parse(text);
-                for(ProxiedPlayer target: plugin.getProxy().getPlayers()){
-                    if(plugin.ignoredPlayers.get(target.getName()) != null && plugin.ignoredPlayers.get(target.getName()).contains(cs.getName()))continue;
-                    if(target.getServer() == null || !plugin.excludedServers.contains(target.getServer().getInfo().getName()))target.sendMessage(msg);
-                }
+                plugin.sendGlobalChatMessage((ProxiedPlayer) cs, finalMessage);
             }
         });
     }

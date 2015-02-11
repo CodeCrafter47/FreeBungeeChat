@@ -103,6 +103,8 @@ adminCommandAliases: ['freebungeechat', 'fbc']
 # This saves you from typing /w CodeCrafter47 ... every time
 enableConversationCommand: true
 conversationCommandAliases: ['chat', 'conversation']
+startConversation: "&aYou started a conversation with %target%. All your chat messages will go directly to %target%."
+endConversation: "&cYour conversation with %target% is over. Chat works as normal again."
 
 ###########################################################
 # ONLY EDIT BELOW SETTINGS IF YOU KNOW WHAT YOU ARE DOING #

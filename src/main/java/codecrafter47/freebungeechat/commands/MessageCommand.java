@@ -20,7 +20,12 @@ public class MessageCommand extends Command {
 
     @Override
     public void execute(CommandSender cs, final String[] args) {
+        if(!(cs instanceof ProxiedPlayer)){
+            cs.sendMessage("Only players can do this");
+            return;
+        }
         if (args.length < 1) {
+            plugin.endConversation((ProxiedPlayer)cs, false);
             return;
         }
         final ProxiedPlayer target = plugin.getProxy().getPlayer(args[0]);
@@ -31,45 +36,17 @@ public class MessageCommand extends Command {
             player.sendMessage(ChatParser.parse(text));
             return;
         }
+        String text = "";
+        for (int i = 1; i < args.length; i++) {
+            text = text + args[i] + " ";
+        }
 
+        final String finalText = text;
         plugin.getProxy().getScheduler().runAsync(plugin, new Runnable() {
             @Override
             public void run() {
-                String text = "";
-                for (int i = 1; i < args.length; i++) {
-                    text = text + args[i] + " ";
-                }
-
-                // check ignored
-                if(plugin.ignoredPlayers.get(target.getName()) != null && plugin.ignoredPlayers.get(target.getName()).contains(player.getName())){
-                    text = plugin.config.getString("ignored").replace(
-                            "%target%", plugin.wrapVariable(args[0]));
-                    player.sendMessage(ChatParser.parse(text));
-                    return;
-                }
-
-                text = plugin.preparePlayerChat(text, player);
-                text = plugin.replaceRegex(text);
-
-                player.sendMessage(ChatParser.parse(
-                        plugin.bukkitBridge.replaceVariables(target, plugin.bukkitBridge.replaceVariables(player, plugin.config.getString("privateMessageSend").replace(
-                                "%target%", plugin.wrapVariable(target.
-                                        getDisplayName())).replace(
-                                "%player%", plugin.wrapVariable(player.
-                                        getDisplayName())).replace(
-                                "%message%", text), ""), "t")));
-
-                target.sendMessage(ChatParser.parse(
-                        plugin.bukkitBridge.replaceVariables(target, plugin.bukkitBridge.replaceVariables(player, plugin.config.getString("privateMessageReceive").replace(
-                                "%target%", plugin.wrapVariable(target.
-                                        getDisplayName())).replace(
-                                "%player%", plugin.wrapVariable(player.
-                                        getDisplayName())).replace(
-                                "%message%", text), ""), "t")));
-
-                plugin.replyTarget.put(target.getName(), player.getName());
+                plugin.sendPrivateMessage(finalText, target, player);
             }
         });
     }
-
 }

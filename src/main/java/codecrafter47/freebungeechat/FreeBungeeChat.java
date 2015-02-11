@@ -43,6 +43,7 @@ import java.util.regex.Pattern;
 
 public class FreeBungeeChat extends Plugin implements Listener {
     public final Map<String, String> replyTarget = new HashMap<>();
+    public final Map<String, String> persistentConversations = new HashMap<>();
     public final Map<String, List<String>> ignoredPlayers = new HashMap<>();
     public Configuration config;
     public static FreeBungeeChat instance;
@@ -68,7 +69,6 @@ public class FreeBungeeChat extends Plugin implements Listener {
         if (config.getStringList("excludeServers") != null) {
             excludedServers = config.getStringList("excludeServers");
         }
-
 
         getProxy().registerChannel(Constants.channel);
         bukkitBridge = new BukkitBridge(this);
@@ -128,54 +128,86 @@ public class FreeBungeeChat extends Plugin implements Listener {
 
         if (!(event.getSender() instanceof ProxiedPlayer)) return;
 
-        // is this global chat?
-        if (!config.getBoolean("alwaysGlobalChat", true)) return;
-
-        if (excludedServers.contains(((ProxiedPlayer) event.getSender()).getServer().getInfo().getName())) return;
-
         // ignore commands
         if (event.isCommand()) {
             return;
         }
 
+        final ProxiedPlayer player = (ProxiedPlayer) event.getSender();
+
+        if (persistentConversations.containsKey(player.getName())){
+            final ProxiedPlayer target = getProxy().getPlayer(persistentConversations.get(player.getName()));
+            if(target != null){
+                getProxy().getScheduler().runAsync(this, new Runnable() {
+                    @Override
+                    public void run() {
+                        sendPrivateMessage(event.getMessage(), target, player);
+                    }
+                });
+                event.setCancelled(true);
+                return;
+            } else {
+                player.sendMessage(ChatParser.parse(config.getString("unknownTarget").replace(
+                        "%target%", wrapVariable(persistentConversations.get(player.getName())))));
+                endConversation(player, true);
+            }
+        }
+
+        // is this global chat?
+        if (!config.getBoolean("alwaysGlobalChat", true)) return;
+
+        if (excludedServers.contains(player.getServer().getInfo().getName())) return;
+
         // cancel event
         event.setCancelled(true);
+
+        final String message = event.getMessage();
 
         getProxy().getScheduler().runAsync(this, new Runnable() {
             @Override
             public void run() {
-                try {
-                    String message = event.getMessage();
-
-                    message = preparePlayerChat(message, (ProxiedPlayer) event.getSender());
-                    message = replaceRegex(message);
-                    message = applyTagLogic(message);
-
-                    // replace variables
-                    String text = config.getString("chatFormat").replace("%player%",
-                            wrapVariable(((ProxiedPlayer) event.getSender()).getDisplayName()));
-                    text = text.replace("%message%", message);
-                    text = bukkitBridge.replaceVariables(((ProxiedPlayer) event.getSender()), text, "");
-
-                    // broadcast message
-                    BaseComponent[] msg = ChatParser.parse(text);
-                    for (ProxiedPlayer target : getProxy().getPlayers()) {
-                        if (ignoredPlayers.get(target.getName()) != null && ignoredPlayers.get(target.getName()).contains(((ProxiedPlayer) event.getSender()).getName()))
-                            continue;
-                        if (!excludedServers.contains(target.getServer().getInfo().getName())){
-                            target.sendMessage(msg);
-                        }
-                    }
-                } catch (Throwable th) {
-                    try {
-                        ((ProxiedPlayer) event.getSender()).sendMessage(ChatParser.parse("&cAn internal error occurred while processing your chat message."));
-                    } catch (Throwable ignored) {
-                        // maybe the player is offline?
-                    }
-                    getLogger().log(Level.SEVERE, "Error while processing chat message", th);
-                }
+                sendGlobalChatMessage(player, message);
             }
         });
+    }
+
+    public void endConversation(ProxiedPlayer player, boolean force) {
+        if(force || persistentConversations.containsKey(player.getName())) {
+            player.sendMessage(ChatParser.parse(config.getString("endConversation").replace(
+                    "%target%", wrapVariable(persistentConversations.get(player.getName())))));
+            persistentConversations.remove(player.getName());
+        }
+    }
+
+    public void sendGlobalChatMessage(ProxiedPlayer player, String message) {
+        try {
+            message = preparePlayerChat(message, player);
+            message = replaceRegex(message);
+            message = applyTagLogic(message);
+
+            // replace variables
+            String text = config.getString("chatFormat").replace("%player%",
+                    wrapVariable(player.getDisplayName()));
+            text = text.replace("%message%", message);
+            text = bukkitBridge.replaceVariables(player, text, "");
+
+            // broadcast message
+            BaseComponent[] msg = ChatParser.parse(text);
+            for (ProxiedPlayer target : getProxy().getPlayers()) {
+                if (ignoredPlayers.get(target.getName()) != null && ignoredPlayers.get(target.getName()).contains(player.getName()))
+                    continue;
+                if (!excludedServers.contains(target.getServer().getInfo().getName())){
+                    target.sendMessage(msg);
+                }
+            }
+        } catch (Throwable th) {
+            try {
+                player.sendMessage(ChatParser.parse("&cAn internal error occurred while processing your chat message."));
+            } catch (Throwable ignored) {
+                // maybe the player is offline?
+            }
+            getLogger().log(Level.SEVERE, "Error while processing chat message", th);
+        }
     }
 
     @EventHandler
@@ -183,6 +215,7 @@ public class FreeBungeeChat extends Plugin implements Listener {
         String name = event.getPlayer().getName();
         if (replyTarget.containsKey(name)) replyTarget.remove(name);
         if (ignoredPlayers.containsKey(name)) ignoredPlayers.remove(name);
+        if (persistentConversations.containsKey(name))persistentConversations.remove(name);
     }
 
     public ProxiedPlayer getReplyTarget(ProxiedPlayer player) {
@@ -276,4 +309,40 @@ public class FreeBungeeChat extends Plugin implements Listener {
         return stringBuffer.toString();
     }
 
+    public void sendPrivateMessage(String text, ProxiedPlayer target, ProxiedPlayer player) {
+        // check ignored
+        if(ignoredPlayers.get(target.getName()) != null && ignoredPlayers.get(target.getName()).contains(player.getName())){
+            text = config.getString("ignored").replace(
+                    "%target%", wrapVariable(target.getName()));
+            player.sendMessage(ChatParser.parse(text));
+            return;
+        }
+
+        text = preparePlayerChat(text, player);
+        text = replaceRegex(text);
+
+        player.sendMessage(ChatParser.parse(
+                bukkitBridge.replaceVariables(target, bukkitBridge.replaceVariables(player, config.getString("privateMessageSend").replace(
+                        "%target%", wrapVariable(target.
+                                getDisplayName())).replace(
+                        "%player%", wrapVariable(player.
+                                getDisplayName())).replace(
+                        "%message%", text), ""), "t")));
+
+        target.sendMessage(ChatParser.parse(
+                bukkitBridge.replaceVariables(target, bukkitBridge.replaceVariables(player, config.getString("privateMessageReceive").replace(
+                        "%target%", wrapVariable(target.
+                                getDisplayName())).replace(
+                        "%player%", wrapVariable(player.
+                                getDisplayName())).replace(
+                        "%message%", text), ""), "t")));
+
+        replyTarget.put(target.getName(), player.getName());
+    }
+
+    public void startConversation(ProxiedPlayer player, ProxiedPlayer target) {
+        persistentConversations.put(player.getName(), target.getName());
+        player.sendMessage(ChatParser.parse(config.getString("startConversation").replace(
+                "%target%", wrapVariable(target.getName()))));
+    }
 }
