@@ -74,6 +74,12 @@ public class VaultHook {
         return (economy != null);
     }
 
+    public void refresh() {
+        setupChat();
+        setupEconomy();
+        setupPermissions();
+    }
+
     public String getGroup(Player player){
         try {
             if (permission != null && permission.getPrimaryGroup(player) != null) {

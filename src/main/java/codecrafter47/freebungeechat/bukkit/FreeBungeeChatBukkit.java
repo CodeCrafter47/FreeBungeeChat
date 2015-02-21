@@ -77,6 +77,9 @@ public class FreeBungeeChatBukkit extends JavaPlugin implements Listener {
 
     @SneakyThrows
     private void processChatMessage(Player player, String text, String prefix, int id, boolean allowBBCode) {
+        if(vaultHook != null){
+            vaultHook.refresh();
+        }
         if(vaultHook != null && text.contains("%" + prefix + "group%")){
             text = text.replace("%" + prefix + "group%", wrapVariable(vaultHook.getGroup(player), allowBBCode));
         }
