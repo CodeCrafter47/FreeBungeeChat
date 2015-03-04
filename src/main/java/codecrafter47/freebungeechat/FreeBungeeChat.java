@@ -19,6 +19,8 @@ package codecrafter47.freebungeechat;
 import codecrafter47.freebungeechat.bukkit.Constants;
 import codecrafter47.freebungeechat.commands.*;
 import com.google.common.base.Charsets;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Iterables;
 import lombok.SneakyThrows;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -241,7 +243,9 @@ public class FreeBungeeChat extends Plugin implements Listener {
     @EventHandler
     public void onTabComplete(TabCompleteEvent event) {
         String commandLine = event.getCursor();
-        if (commandLine.startsWith("/tell") || commandLine.startsWith("/message") || commandLine.startsWith("/w") || commandLine.startsWith("/whisper") || commandLine.startsWith("/msg")) {
+        if (!commandLine.startsWith("/"))return;
+        if (commandLine.matches("^/(?:" + Joiner.on('|').join(Iterables.concat(config.getStringList("messageCommandAliases"),
+                config.getStringList("conversationCommandAliases")))+ ").*$")) {
             event.getSuggestions().clear();
             String[] split = commandLine.split(" ");
             String begin = split[split.length - 1];
