@@ -24,7 +24,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
 /**
- *
  * @author Florian Stober
  */
 public class VaultHook {
@@ -45,7 +44,7 @@ public class VaultHook {
     private boolean setupPermissions() {
         RegisteredServiceProvider<Permission> permissionProvider = Bukkit.
                 getServer().getServicesManager().getRegistration(
-                        net.milkbowl.vault.permission.Permission.class);
+                net.milkbowl.vault.permission.Permission.class);
         if (permissionProvider != null) {
             permission = permissionProvider.getProvider();
         }
@@ -55,7 +54,7 @@ public class VaultHook {
     private boolean setupChat() {
         RegisteredServiceProvider<Chat> chatProvider = Bukkit.getServer().
                 getServicesManager().getRegistration(
-                        net.milkbowl.vault.chat.Chat.class);
+                net.milkbowl.vault.chat.Chat.class);
         if (chatProvider != null) {
             chat = chatProvider.getProvider();
         }
@@ -66,7 +65,7 @@ public class VaultHook {
     private boolean setupEconomy() {
         RegisteredServiceProvider<Economy> economyProvider = Bukkit.getServer().
                 getServicesManager().getRegistration(
-                        net.milkbowl.vault.economy.Economy.class);
+                net.milkbowl.vault.economy.Economy.class);
         if (economyProvider != null) {
             economy = economyProvider.getProvider();
         }
@@ -80,46 +79,46 @@ public class VaultHook {
         setupPermissions();
     }
 
-    public String getGroup(Player player){
+    public String getGroup(Player player) {
         try {
             if (permission != null && permission.getPrimaryGroup(player) != null) {
                 return permission.getPrimaryGroup(player);
             }
-        } catch (UnsupportedOperationException ignored){
+        } catch (UnsupportedOperationException ignored) {
         }
         return "unknown";
     }
 
-    public String getPrefix(Player player){
-        if(chat != null){
+    public String getPrefix(Player player) {
+        if (chat != null) {
             return chat.getPlayerPrefix(player);
         }
         return "unknown";
     }
 
-    public String getSuffix(Player player){
-        if(chat != null){
+    public String getSuffix(Player player) {
+        if (chat != null) {
             return chat.getPlayerSuffix(player);
         }
         return "unknown";
     }
 
-    public String getBalance(Player player){
-        if(economy != null){
+    public String getBalance(Player player) {
+        if (economy != null) {
             return Double.toString(economy.getBalance(player.getName()));
         }
         return "-";
     }
 
-    public String getCurrencyName(){
-        if(economy != null){
+    public String getCurrencyName() {
+        if (economy != null) {
             return economy.currencyNameSingular();
         }
         return "$";
     }
 
-    public String getCurrencyNamePl(){
-        if(economy != null){
+    public String getCurrencyNamePl() {
+        if (economy != null) {
             return economy.currencyNamePlural();
         }
         return "$";

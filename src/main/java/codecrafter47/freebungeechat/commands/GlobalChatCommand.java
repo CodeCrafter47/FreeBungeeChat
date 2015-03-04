@@ -6,8 +6,8 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 
 /**
-* Created by florian on 28.01.15.
-*/
+ * Created by florian on 28.01.15.
+ */
 public class GlobalChatCommand extends Command {
 
     private FreeBungeeChat plugin;
@@ -19,7 +19,7 @@ public class GlobalChatCommand extends Command {
 
     @Override
     public void execute(final CommandSender cs, final String[] args) {
-        if(!(cs instanceof ProxiedPlayer)){
+        if (!(cs instanceof ProxiedPlayer)) {
             cs.sendMessage("Only players can do this");
             return;
         }
@@ -29,7 +29,7 @@ public class GlobalChatCommand extends Command {
             message = message + arg + " ";
         }
 
-        if(message.isEmpty()){
+        if (message.isEmpty()) {
             plugin.endConversation((ProxiedPlayer) cs, false);
             return;
         }

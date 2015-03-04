@@ -17,7 +17,6 @@
 package codecrafter47.freebungeechat.bukkit;
 
 /**
- *
  * @author Florian Stober
  */
 public class Constants {

@@ -65,7 +65,7 @@ public class BukkitBridge implements Listener {
 
                     String subchannel = in.readUTF();
 
-                    if(subchannel.equals(Constants.subchannel_chatMsg)){
+                    if (subchannel.equals(Constants.subchannel_chatMsg)) {
                         buf.put(in.readInt(), in.readUTF());
                     }
 
@@ -95,11 +95,11 @@ public class BukkitBridge implements Listener {
     @SneakyThrows
     public String replaceVariables(ProxiedPlayer player, String text, String prefix) {
         int tries = 0;
-        while(text.matches("^.*%" + prefix + "(group|prefix|suffix|balance|currency|currencyPl|tabName|displayName|world|health|level)%.*$")
-                && tries < 3){
-            try{
+        while (text.matches("^.*%" + prefix + "(group|prefix|suffix|balance|currency|currencyPl|tabName|displayName|world|health|level)%.*$")
+                && tries < 3) {
+            try {
                 int id = getId();
-                if(buf.containsKey(id))buf.remove(id);
+                if (buf.containsKey(id)) buf.remove(id);
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
                 DataOutputStream outputStream1 = new DataOutputStream(outputStream);
                 outputStream1.writeUTF(Constants.subchannel_chatMsg);
@@ -110,22 +110,22 @@ public class BukkitBridge implements Listener {
                 outputStream1.flush();
                 outputStream1.close();
                 player.getServer().sendData(Constants.channel, outputStream.toByteArray());
-                for(int i = 0; i < 10 && !buf.containsKey(id); i++){
+                for (int i = 0; i < 10 && !buf.containsKey(id); i++) {
                     Thread.sleep(100);
                 }
-                if(buf.containsKey(id)){
+                if (buf.containsKey(id)) {
                     text = buf.get(id);
                     buf.remove(id);
                     tries = 0;
                     break;
                 }
-            } catch (Throwable th){
+            } catch (Throwable th) {
                 th.printStackTrace();
                 Thread.sleep(1000);
             }
             tries++;
         }
-        if(tries > 0){
+        if (tries > 0) {
             throw new RuntimeException("Unable to process chat message from " + player.getName() + " make sure you have installed FreeBungeeChat on " + (player.getServer() != null ? player.getServer().getInfo().getName() : "(unknown server)"));
         }
         text = text.replace("%" + prefix + "server%", plugin.wrapVariable(player.getServer() != null ? player.getServer().getInfo().getName() : "unknown"));

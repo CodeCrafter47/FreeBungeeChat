@@ -52,11 +52,11 @@ public class FreeBungeeChatBukkit extends JavaPlugin implements Listener {
                                 new ByteArrayInputStream(bytes));
 
                         String subchannel = in.readUTF();
-                        if(subchannel.equalsIgnoreCase(Constants.subchannel_chatMsg)){
+                        if (subchannel.equalsIgnoreCase(Constants.subchannel_chatMsg)) {
                             String text = in.readUTF();
                             String prefix = in.readUTF();
                             int id = in.readInt();
-                            boolean allowBBCode =in.readBoolean();
+                            boolean allowBBCode = in.readBoolean();
                             processChatMessage(player, text, prefix, id, allowBBCode);
                         }
                         if (subchannel.equalsIgnoreCase(Constants.subchannel_playSound)) {
@@ -77,40 +77,40 @@ public class FreeBungeeChatBukkit extends JavaPlugin implements Listener {
 
     @SneakyThrows
     private void processChatMessage(Player player, String text, String prefix, int id, boolean allowBBCode) {
-        if(vaultHook != null){
+        if (vaultHook != null) {
             vaultHook.refresh();
         }
-        if(vaultHook != null && text.contains("%" + prefix + "group%")){
+        if (vaultHook != null && text.contains("%" + prefix + "group%")) {
             text = text.replace("%" + prefix + "group%", wrapVariable(vaultHook.getGroup(player), allowBBCode));
         }
-        if(vaultHook != null && text.contains("%" + prefix + "prefix%")){
+        if (vaultHook != null && text.contains("%" + prefix + "prefix%")) {
             text = text.replace("%" + prefix + "prefix%", wrapVariable(vaultHook.getPrefix(player), allowBBCode));
         }
-        if(vaultHook != null && text.contains("%" + prefix + "suffix%")){
+        if (vaultHook != null && text.contains("%" + prefix + "suffix%")) {
             text = text.replace("%" + prefix + "suffix%", wrapVariable(vaultHook.getSuffix(player), allowBBCode));
         }
-        if(vaultHook != null && text.contains("%" + prefix + "balance%")){
+        if (vaultHook != null && text.contains("%" + prefix + "balance%")) {
             text = text.replace("%" + prefix + "balance%", wrapVariable(vaultHook.getBalance(player), allowBBCode));
         }
-        if(vaultHook != null && text.contains("%" + prefix + "currency%")){
+        if (vaultHook != null && text.contains("%" + prefix + "currency%")) {
             text = text.replace("%" + prefix + "currency%", wrapVariable(vaultHook.getCurrencyName(), allowBBCode));
         }
-        if(vaultHook != null && text.contains("%" + prefix + "currencyPl%")){
+        if (vaultHook != null && text.contains("%" + prefix + "currencyPl%")) {
             text = text.replace("%" + prefix + "currencyPl%", wrapVariable(vaultHook.getCurrencyNamePl(), allowBBCode));
         }
-        if(text.contains("%" + prefix + "tabName%")){
+        if (text.contains("%" + prefix + "tabName%")) {
             text = text.replace("%" + prefix + "tabName%", wrapVariable(player.getPlayerListName(), allowBBCode));
         }
-        if(text.contains("%" + prefix + "displayName%")){
+        if (text.contains("%" + prefix + "displayName%")) {
             text = text.replace("%" + prefix + "displayName%", wrapVariable(player.getDisplayName(), allowBBCode));
         }
-        if(text.contains("%" + prefix + "world%")){
+        if (text.contains("%" + prefix + "world%")) {
             text = text.replace("%" + prefix + "world%", wrapVariable(player.getWorld().getName(), allowBBCode));
         }
-        if(text.contains("%" + prefix + "health%")){
+        if (text.contains("%" + prefix + "health%")) {
             text = text.replace("%" + prefix + "health%", wrapVariable(Double.toString(player.getHealth()), allowBBCode));
         }
-        if(text.contains("%" + prefix + "level%")){
+        if (text.contains("%" + prefix + "level%")) {
             text = text.replace("%" + prefix + "level%", wrapVariable(Integer.toString(player.getLevel()), allowBBCode));
         }
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -123,8 +123,8 @@ public class FreeBungeeChatBukkit extends JavaPlugin implements Listener {
         player.sendPluginMessage(this, Constants.channel, outputStream.toByteArray());
     }
 
-    public String wrapVariable(String variable, boolean allowBBCode){
-        if(allowBBCode){
+    public String wrapVariable(String variable, boolean allowBBCode) {
+        if (allowBBCode) {
             return variable;
         } else {
             return "[nobbcode]" + variable + "[/nobbcode]";

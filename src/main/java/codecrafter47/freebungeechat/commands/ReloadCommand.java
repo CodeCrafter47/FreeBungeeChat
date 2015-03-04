@@ -8,8 +8,8 @@ import net.md_5.bungee.api.plugin.Command;
 import java.io.IOException;
 
 /**
-* Created by florian on 28.01.15.
-*/
+ * Created by florian on 28.01.15.
+ */
 public class ReloadCommand extends Command {
     private final FreeBungeeChat plugin;
 
@@ -20,7 +20,7 @@ public class ReloadCommand extends Command {
 
     @Override
     public void execute(CommandSender commandSender, String[] strings) {
-        if(strings.length == 1 && strings[0].equalsIgnoreCase("reload")){
+        if (strings.length == 1 && strings[0].equalsIgnoreCase("reload")) {
             try {
                 plugin.reloadConfig();
                 commandSender.sendMessage(ChatParser.parse("[color=blue][[color=red]FreeBungeeChat[/color]][/color] &aConfiguration has been reloaded."));

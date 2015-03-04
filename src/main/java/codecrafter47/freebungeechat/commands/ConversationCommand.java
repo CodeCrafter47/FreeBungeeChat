@@ -19,12 +19,12 @@ public class ConversationCommand extends Command {
 
     @Override
     public void execute(CommandSender cs, String[] args) {
-        if(!(cs instanceof ProxiedPlayer)){
+        if (!(cs instanceof ProxiedPlayer)) {
             cs.sendMessage("Only players can do this");
             return;
         }
         if (args.length < 1) {
-            plugin.endConversation((ProxiedPlayer)cs, true);
+            plugin.endConversation((ProxiedPlayer) cs, true);
             return;
         }
         final ProxiedPlayer target = plugin.getProxy().getPlayer(args[0]);

@@ -126,10 +126,11 @@ public class FreeBungeeChat extends Plugin implements Listener {
 
     /**
      * Checks whether a player is spamming
+     *
      * @param player the player
      * @return true if chat should be cancelled
      */
-    public boolean checkSpam(ProxiedPlayer player){
+    public boolean checkSpam(ProxiedPlayer player) {
         if (!config.getBoolean("enableAntiSpam", true))
             return false;
         String name = player.getName();
@@ -159,9 +160,9 @@ public class FreeBungeeChat extends Plugin implements Listener {
 
         final ProxiedPlayer player = (ProxiedPlayer) event.getSender();
 
-        if (persistentConversations.containsKey(player.getName())){
+        if (persistentConversations.containsKey(player.getName())) {
             final ProxiedPlayer target = getProxy().getPlayer(persistentConversations.get(player.getName()));
-            if(target != null){
+            if (target != null) {
                 getProxy().getScheduler().runAsync(this, new Runnable() {
                     @Override
                     public void run() {
@@ -196,7 +197,7 @@ public class FreeBungeeChat extends Plugin implements Listener {
     }
 
     public void endConversation(ProxiedPlayer player, boolean force) {
-        if(force || persistentConversations.containsKey(player.getName())) {
+        if (force || persistentConversations.containsKey(player.getName())) {
             player.sendMessage(ChatParser.parse(config.getString("endConversation").replace(
                     "%target%", wrapVariable(persistentConversations.get(player.getName())))));
             persistentConversations.remove(player.getName());
@@ -205,7 +206,7 @@ public class FreeBungeeChat extends Plugin implements Listener {
 
     public void sendGlobalChatMessage(ProxiedPlayer player, String message) {
         try {
-            if(checkSpam(player)){
+            if (checkSpam(player)) {
                 return;
             }
             message = preparePlayerChat(message, player);
@@ -223,7 +224,7 @@ public class FreeBungeeChat extends Plugin implements Listener {
             for (ProxiedPlayer target : getProxy().getPlayers()) {
                 if (ignoredPlayers.get(target.getName()) != null && ignoredPlayers.get(target.getName()).contains(player.getName()))
                     continue;
-                if (!excludedServers.contains(target.getServer().getInfo().getName())){
+                if (!excludedServers.contains(target.getServer().getInfo().getName())) {
                     target.sendMessage(msg);
                 }
             }
@@ -242,8 +243,8 @@ public class FreeBungeeChat extends Plugin implements Listener {
         String name = event.getPlayer().getName();
         if (replyTarget.containsKey(name)) replyTarget.remove(name);
         if (ignoredPlayers.containsKey(name)) ignoredPlayers.remove(name);
-        if (persistentConversations.containsKey(name))persistentConversations.remove(name);
-        if (spamDataMap.containsKey(name))spamDataMap.remove(name);
+        if (persistentConversations.containsKey(name)) persistentConversations.remove(name);
+        if (spamDataMap.containsKey(name)) spamDataMap.remove(name);
     }
 
     public ProxiedPlayer getReplyTarget(ProxiedPlayer player) {
@@ -269,9 +270,9 @@ public class FreeBungeeChat extends Plugin implements Listener {
     @EventHandler
     public void onTabComplete(TabCompleteEvent event) {
         String commandLine = event.getCursor();
-        if (!commandLine.startsWith("/"))return;
+        if (!commandLine.startsWith("/")) return;
         if (commandLine.matches("^/(?:" + Joiner.on('|').join(Iterables.concat(config.getStringList("messageCommandAliases"),
-                config.getStringList("conversationCommandAliases")))+ ").*$")) {
+                config.getStringList("conversationCommandAliases"))) + ").*$")) {
             event.getSuggestions().clear();
             String[] split = commandLine.split(" ");
             String begin = split[split.length - 1];
@@ -340,11 +341,11 @@ public class FreeBungeeChat extends Plugin implements Listener {
     }
 
     public void sendPrivateMessage(String text, ProxiedPlayer target, ProxiedPlayer player) {
-        if(checkSpam(player)){
+        if (checkSpam(player)) {
             return;
         }
         // check ignored
-        if(ignoredPlayers.get(target.getName()) != null && ignoredPlayers.get(target.getName()).contains(player.getName())){
+        if (ignoredPlayers.get(target.getName()) != null && ignoredPlayers.get(target.getName()).contains(player.getName())) {
             text = config.getString("ignored").replace(
                     "%target%", wrapVariable(target.getName()));
             player.sendMessage(ChatParser.parse(text));

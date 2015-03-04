@@ -20,7 +20,7 @@ public class ReplyCommand extends Command {
 
     @Override
     public void execute(CommandSender cs, final String[] args) {
-        if(!(cs instanceof ProxiedPlayer)){
+        if (!(cs instanceof ProxiedPlayer)) {
             cs.sendMessage("Only players can do this");
             return;
         }
