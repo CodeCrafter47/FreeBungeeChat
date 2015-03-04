@@ -47,6 +47,7 @@ public class FreeBungeeChat extends Plugin implements Listener {
     public final Map<String, String> replyTarget = new HashMap<>();
     public final Map<String, String> persistentConversations = new HashMap<>();
     public final Map<String, List<String>> ignoredPlayers = new HashMap<>();
+    public final Map<String, AntiSpamData> spamDataMap = new HashMap<>();
     public Configuration config;
     public static FreeBungeeChat instance;
 
@@ -123,6 +124,27 @@ public class FreeBungeeChat extends Plugin implements Listener {
         }
     }
 
+    /**
+     * Checks whether a player is spamming
+     * @param player the player
+     * @return true if chat should be cancelled
+     */
+    public boolean checkSpam(ProxiedPlayer player){
+        if (!config.getBoolean("enableAntiSpam", true))
+            return false;
+        String name = player.getName();
+        if (!spamDataMap.containsKey(name)) {
+            spamDataMap.put(name, new AntiSpamData());
+        }
+        AntiSpamData antiSpamData = spamDataMap.get(name);
+        if (antiSpamData.isSpamming()) {
+            player.sendMessage(ChatParser.parse(config.getString("antiSpamText",
+                    "&cYou send to many messages. Please wait a minute before sending messages again.")));
+            return true;
+        }
+        return false;
+    }
+
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onChat(final ChatEvent event) {
         // ignore canceled chat
@@ -183,6 +205,9 @@ public class FreeBungeeChat extends Plugin implements Listener {
 
     public void sendGlobalChatMessage(ProxiedPlayer player, String message) {
         try {
+            if(checkSpam(player)){
+                return;
+            }
             message = preparePlayerChat(message, player);
             message = replaceRegex(message);
             message = applyTagLogic(message);
@@ -218,6 +243,7 @@ public class FreeBungeeChat extends Plugin implements Listener {
         if (replyTarget.containsKey(name)) replyTarget.remove(name);
         if (ignoredPlayers.containsKey(name)) ignoredPlayers.remove(name);
         if (persistentConversations.containsKey(name))persistentConversations.remove(name);
+        if (spamDataMap.containsKey(name))spamDataMap.remove(name);
     }
 
     public ProxiedPlayer getReplyTarget(ProxiedPlayer player) {
@@ -314,6 +340,9 @@ public class FreeBungeeChat extends Plugin implements Listener {
     }
 
     public void sendPrivateMessage(String text, ProxiedPlayer target, ProxiedPlayer player) {
+        if(checkSpam(player)){
+            return;
+        }
         // check ignored
         if(ignoredPlayers.get(target.getName()) != null && ignoredPlayers.get(target.getName()).contains(player.getName())){
             text = config.getString("ignored").replace(

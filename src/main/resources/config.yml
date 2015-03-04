@@ -25,6 +25,11 @@ taggedPlayer: "[color=gold][suggest=/w ${name}]@${name}[/suggest][/color]"
 playSoundToTaggedPlayer: true
 playerTaggedSound: ORB_PICKUP
 
+# Anti-Spam
+# if enabled players which send too many messages in a short time will be muted for a minute
+enableAntiSpam: true
+antiSpamText: "&cYou send to many messages. Please wait a minute before sending messages again."
+
 # you can add custom regular expressions here
 regex:
 # make any pasted links clickable for convenience
