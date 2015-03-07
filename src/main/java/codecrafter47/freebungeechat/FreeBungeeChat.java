@@ -282,7 +282,7 @@ public class FreeBungeeChat extends Plugin implements Listener {
             String[] split = commandLine.split(" ");
             String begin = split[split.length - 1];
             for (ProxiedPlayer player : getProxy().getPlayers()) {
-                if (player.getName().contains(begin) || player.getDisplayName().contains(begin)) {
+                if (player.getName().toLowerCase().contains(begin.toLowerCase()) || player.getDisplayName().toLowerCase().contains(begin.toLowerCase())) {
                     event.getSuggestions().add(player.getName());
                 }
             }
