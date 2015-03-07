@@ -198,9 +198,14 @@ public class FreeBungeeChat extends Plugin implements Listener {
 
     public void endConversation(ProxiedPlayer player, boolean force) {
         if (force || persistentConversations.containsKey(player.getName())) {
-            player.sendMessage(ChatParser.parse(config.getString("endConversation").replace(
-                    "%target%", wrapVariable(persistentConversations.get(player.getName())))));
-            persistentConversations.remove(player.getName());
+            if(persistentConversations.containsKey(player.getName())) {
+                player.sendMessage(ChatParser.parse(config.getString("endConversation").replace(
+                        "%target%", wrapVariable(persistentConversations.get(player.getName())))));
+                persistentConversations.remove(player.getName());
+            } else {
+                player.sendMessage(ChatParser.parse(config.getString("endConversation").replace(
+                        "%target%", "nobody")));
+            }
         }
     }
 
