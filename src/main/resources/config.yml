@@ -25,6 +25,10 @@ taggedPlayer: "[color=gold][suggest=/w ${name}]@${name}[/suggest][/color]"
 playSoundToTaggedPlayer: true
 playerTaggedSound: ORB_PICKUP
 
+# sound on private message
+playSoundPrivateMessage: true
+privateMessageMessageSound: ORB_PICKUP
+
 # Anti-Spam
 # if enabled players which send too many messages in a short time will be muted for a minute
 enableAntiSpam: true

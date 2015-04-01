@@ -377,6 +377,10 @@ public class FreeBungeeChat extends Plugin implements Listener {
                         "%message%", text), ""), "t")));
 
         replyTarget.put(target.getName(), player.getName());
+
+        if (config.getBoolean("playSoundPrivateMessage", true)) {
+            bukkitBridge.playSound(target, config.getString("privateMessageMessageSound", "ORB_PICKUP"));
+        }
     }
 
     public void startConversation(ProxiedPlayer player, ProxiedPlayer target) {
