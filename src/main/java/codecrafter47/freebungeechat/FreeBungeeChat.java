@@ -246,6 +246,32 @@ public class FreeBungeeChat extends Plugin implements Listener {
         }
     }
 
+    public void sendGlobalConsoleChatMessage(String message) {
+        try {
+            message = replaceRegex(message);
+            message = applyTagLogic(message);
+
+            // replace variables
+            String text = config.getString("chatFormat").replace("%player%",
+                    config.getString("consoleName", "SERVER"));
+            text = text.replace("%message%", message);
+            text = text.replaceAll("%(group|prefix|suffix|balance|currency|currencyPl|tabName|displayName|world|health|level)%", "");
+
+            // broadcast message
+            BaseComponent[] msg = ChatParser.parse(text);
+            for (ProxiedPlayer target : getProxy().getPlayers()) {
+                if (!excludedServers.contains(target.getServer().getInfo().getName())) {
+                    target.sendMessage(msg);
+                }
+            }
+            if(config.getBoolean("logChat", false)){
+                getLogger().info(config.getString("consoleName", "SERVER") + ": " + message);
+            }
+        } catch (Throwable th) {
+            getLogger().log(Level.SEVERE, "Error while processing chat message", th);
+        }
+    }
+
     @EventHandler
     public void onDisconnect(PlayerDisconnectEvent event) {
         String name = event.getPlayer().getName();

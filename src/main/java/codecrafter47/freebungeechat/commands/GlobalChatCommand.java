@@ -19,14 +19,15 @@ public class GlobalChatCommand extends Command {
 
     @Override
     public void execute(final CommandSender cs, final String[] args) {
-        if (!(cs instanceof ProxiedPlayer)) {
-            cs.sendMessage("Only players can do this");
-            return;
-        }
-
         String message = "";
         for (String arg : args) {
             message = message + arg + " ";
+        }
+
+        if (!(cs instanceof ProxiedPlayer)) {
+            if(!message.trim().isEmpty())plugin.sendGlobalConsoleChatMessage(message);
+            else cs.sendMessage("/g <message>");
+            return;
         }
 
         if (message.isEmpty()) {

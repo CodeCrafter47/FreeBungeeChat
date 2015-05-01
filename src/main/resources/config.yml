@@ -37,6 +37,8 @@ antiSpamText: "&cYou send to many messages. Please wait a minute before sending 
 # Chat logging
 # if enabled chat messaged are written into proxy log
 logChat: false
+# name used when using /g in the server console
+consoleName: "SERVER"
 
 # you can add custom regular expressions here
 regex:
