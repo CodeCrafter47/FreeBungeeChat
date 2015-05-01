@@ -34,6 +34,10 @@ privateMessageMessageSound: ORB_PICKUP
 enableAntiSpam: true
 antiSpamText: "&cYou send to many messages. Please wait a minute before sending messages again."
 
+# Chat logging
+# if enabled chat messaged are written into proxy log
+logChat: false
+
 # you can add custom regular expressions here
 regex:
 # make any pasted links clickable for convenience

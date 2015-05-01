@@ -233,6 +233,9 @@ public class FreeBungeeChat extends Plugin implements Listener {
                     target.sendMessage(msg);
                 }
             }
+            if(config.getBoolean("logChat", false)){
+                getLogger().info(player.getName() + ": " + message);
+            }
         } catch (Throwable th) {
             try {
                 player.sendMessage(ChatParser.parse("&cAn internal error occurred while processing your chat message."));
