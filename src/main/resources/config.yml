@@ -109,6 +109,11 @@ replyCommandAliases: ['reply', 'r']
 enableGlobalChatCommand: true
 globalChatCommandAliases: ['global', 'g']
 
+# local chat /local
+# use this command to force a local chat message
+enableLocalChatCommand: false
+localChatCommandAliases: ['local', 'l']
+
 # /freebungeechat allows admins to reload the plugin ingame
 enableAdminCommand: true
 adminCommandAliases: ['freebungeechat', 'fbc']

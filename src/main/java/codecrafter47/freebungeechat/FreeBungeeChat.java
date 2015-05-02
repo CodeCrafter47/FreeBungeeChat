@@ -122,6 +122,13 @@ public class FreeBungeeChat extends Plugin implements Listener {
             super.getProxy().getPluginManager().registerCommand(this, new ConversationCommand(this, aliases.get(0), null,
                     aliases.subList(1, aliases.size()).toArray(new String[aliases.size() - 1])));
         }
+
+        aliases = config.getStringList("localChatCommandAliases");
+        if (aliases == null || aliases.isEmpty()) aliases = Arrays.asList("local");
+        if (config.getBoolean("enableLocalChatCommand", false)) {
+            super.getProxy().getPluginManager().registerCommand(this, new LocalChatCommand(this, aliases.get(0), null,
+                    aliases.subList(1, aliases.size()).toArray(new String[aliases.size() - 1])));
+        }
     }
 
     /**

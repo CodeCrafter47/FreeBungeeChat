@@ -17,6 +17,9 @@ Commands
 `/r` - reply to a previous message
 `/ignore` - don't receive messages from a specific player
 `/freebungeechat reload` - reload the configuration
+`/global` - global chat
+`/local` - local chat
+`/chat` - start a conversation
 
 Text Format
 ===========
