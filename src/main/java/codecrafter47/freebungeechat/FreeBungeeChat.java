@@ -25,6 +25,7 @@ import lombok.SneakyThrows;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.event.ChatEvent;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.event.TabCompleteEvent;
@@ -236,7 +237,8 @@ public class FreeBungeeChat extends Plugin implements Listener {
             for (ProxiedPlayer target : getProxy().getPlayers()) {
                 if (ignoredPlayers.get(target.getName()) != null && ignoredPlayers.get(target.getName()).contains(player.getName()))
                     continue;
-                if (!excludedServers.contains(target.getServer().getInfo().getName())) {
+                Server server = target.getServer();
+                if (server == null || !excludedServers.contains(server.getInfo().getName())) {
                     target.sendMessage(msg);
                 }
             }
@@ -267,7 +269,8 @@ public class FreeBungeeChat extends Plugin implements Listener {
             // broadcast message
             BaseComponent[] msg = ChatParser.parse(text);
             for (ProxiedPlayer target : getProxy().getPlayers()) {
-                if (!excludedServers.contains(target.getServer().getInfo().getName())) {
+                Server server = target.getServer();
+                if (server == null || !excludedServers.contains(server.getInfo().getName())) {
                     target.sendMessage(msg);
                 }
             }
