@@ -243,7 +243,7 @@ public class FreeBungeeChat extends Plugin implements Listener {
                 }
             }
             if(config.getBoolean("logChat", false)){
-                getProxy().getLogger().info(player.getName() + ": " + message);
+                getProxy().getLogger().info("[Chat] " + player.getName() + ": " + message);
             }
         } catch (Throwable th) {
             try {
@@ -275,7 +275,7 @@ public class FreeBungeeChat extends Plugin implements Listener {
                 }
             }
             if(config.getBoolean("logChat", false)){
-                getProxy().getLogger().info(config.getString("consoleName", "SERVER") + ": " + message);
+                getProxy().getLogger().info("[Chat] " + config.getString("consoleName", "SERVER") + ": " + message);
             }
         } catch (Throwable th) {
             getLogger().log(Level.SEVERE, "Error while processing chat message", th);
