@@ -229,8 +229,8 @@ public class FreeBungeeChat extends Plugin implements Listener {
             // replace variables
             String text = config.getString("chatFormat").replace("%player%",
                     wrapVariable(player.getDisplayName()));
-            text = text.replace("%message%", message);
             text = bukkitBridge.replaceVariables(player, text, "");
+            text = text.replace("%message%", message);
 
             // broadcast message
             BaseComponent[] msg = ChatParser.parse(text);
@@ -263,8 +263,8 @@ public class FreeBungeeChat extends Plugin implements Listener {
             // replace variables
             String text = config.getString("chatFormat").replace("%player%",
                     config.getString("consoleName", "SERVER"));
-            text = text.replace("%message%", message);
             text = text.replaceAll("%(server|group|prefix(color)?|suffix|balance|currency|currencyPl|tabName|displayName|world|health|level)%", "");
+            text = text.replace("%message%", message);
 
             // broadcast message
             BaseComponent[] msg = ChatParser.parse(text);
@@ -404,16 +404,16 @@ public class FreeBungeeChat extends Plugin implements Listener {
                         "%target%", wrapVariable(target.
                                 getDisplayName())).replace(
                         "%player%", wrapVariable(player.
-                                getDisplayName())).replace(
-                        "%message%", text), ""), "t")));
+                                getDisplayName())), ""), "t").replace(
+                        "%message%", text)));
 
         target.sendMessage(ChatParser.parse(
                 bukkitBridge.replaceVariables(target, bukkitBridge.replaceVariables(player, config.getString("privateMessageReceive").replace(
                         "%target%", wrapVariable(target.
                                 getDisplayName())).replace(
                         "%player%", wrapVariable(player.
-                                getDisplayName())).replace(
-                        "%message%", text), ""), "t")));
+                                getDisplayName())), ""), "t").replace(
+                        "%message%", text)));
 
         replyTarget.put(target.getName(), player.getName());
 
