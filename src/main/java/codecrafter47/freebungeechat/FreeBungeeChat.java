@@ -264,7 +264,7 @@ public class FreeBungeeChat extends Plugin implements Listener {
             String text = config.getString("chatFormat").replace("%player%",
                     config.getString("consoleName", "SERVER"));
             text = text.replace("%message%", message);
-            text = text.replaceAll("%(group|prefix|suffix|balance|currency|currencyPl|tabName|displayName|world|health|level)%", "");
+            text = text.replaceAll("%(server|group|prefix|suffix|balance|currency|currencyPl|tabName|displayName|world|health|level)%", "");
 
             // broadcast message
             BaseComponent[] msg = ChatParser.parse(text);
