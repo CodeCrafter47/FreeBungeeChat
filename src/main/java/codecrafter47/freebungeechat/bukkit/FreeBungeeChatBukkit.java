@@ -86,6 +86,10 @@ public class FreeBungeeChatBukkit extends JavaPlugin implements Listener {
         if (vaultHook != null && text.contains("%" + prefix + "prefix%")) {
             text = text.replace("%" + prefix + "prefix%", wrapVariable(vaultHook.getPrefix(player), allowBBCode));
         }
+        if (vaultHook != null && text.contains("%" + prefix + "prefixcolor%")) {
+            String prefix1 = vaultHook.getPrefix(player);
+            text = text.replace("%" + prefix + "prefixcolor%", wrapVariable(prefix1.substring(0, Math.min(2, prefix1.length())), allowBBCode));
+        }
         if (vaultHook != null && text.contains("%" + prefix + "suffix%")) {
             text = text.replace("%" + prefix + "suffix%", wrapVariable(vaultHook.getSuffix(player), allowBBCode));
         }
