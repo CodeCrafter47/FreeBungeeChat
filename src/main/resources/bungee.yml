@@ -1,4 +1,4 @@
 name: FreeBungeeChat
 main : codecrafter47.freebungeechat.FreeBungeeChat
-version: 2.0
+version: ${version}
 author: CodeCrafter47

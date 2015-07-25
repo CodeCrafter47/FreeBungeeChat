@@ -1,6 +1,6 @@
 name: FreeBungeeChat
 main: codecrafter47.freebungeechat.bukkit.FreeBungeeChatBukkit
-version: 2.0
+version: ${version}
 authors:
   - CodeCrafter47
 softdepend: [Vault]
