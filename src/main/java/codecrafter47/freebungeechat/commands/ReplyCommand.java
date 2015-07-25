@@ -1,6 +1,6 @@
 package codecrafter47.freebungeechat.commands;
 
-import codecrafter47.freebungeechat.ChatParser;
+import codecrafter47.chat.ChatParser;
 import codecrafter47.freebungeechat.FreeBungeeChat;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -11,11 +11,13 @@ import net.md_5.bungee.api.plugin.Command;
  */
 public class ReplyCommand extends Command {
 
-    private FreeBungeeChat plugin;
+    private final FreeBungeeChat plugin;
+    private final ChatParser chatParser;
 
-    public ReplyCommand(FreeBungeeChat plugin, String name, String permission, String... aliases) {
+    public ReplyCommand(FreeBungeeChat plugin, String name, String permission, ChatParser chatParser, String... aliases) {
         super(name, permission, aliases);
         this.plugin = plugin;
+        this.chatParser = chatParser;
     }
 
     @Override
@@ -33,7 +35,7 @@ public class ReplyCommand extends Command {
             String text = plugin.config.getString("unknownTarget").replace(
                     "%target%",
                     plugin.wrapVariable(args[0]));
-            player.sendMessage(ChatParser.parse(text));
+            player.sendMessage(chatParser.parse(text));
             return;
         }
         String text = "";

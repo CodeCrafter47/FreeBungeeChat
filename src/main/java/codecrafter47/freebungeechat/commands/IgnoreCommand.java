@@ -1,6 +1,6 @@
 package codecrafter47.freebungeechat.commands;
 
-import codecrafter47.freebungeechat.ChatParser;
+import codecrafter47.chat.ChatParser;
 import codecrafter47.freebungeechat.FreeBungeeChat;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -14,11 +14,13 @@ import java.util.List;
  */
 public class IgnoreCommand extends Command {
 
-    private FreeBungeeChat plugin;
+    private final FreeBungeeChat plugin;
+    private final ChatParser chatParser;
 
-    public IgnoreCommand(FreeBungeeChat plugin, String name, String permission, String... aliases) {
+    public IgnoreCommand(FreeBungeeChat plugin, String name, String permission, ChatParser chatParser, String... aliases) {
         super(name, permission, aliases);
         this.plugin = plugin;
+        this.chatParser = chatParser;
     }
 
     @Override
@@ -38,7 +40,7 @@ public class IgnoreCommand extends Command {
             String text = plugin.config.getString("unknownTarget").replace(
                     "%target%",
                     plugin.wrapVariable(args[0]));
-            cs.sendMessage(ChatParser.parse(text));
+            cs.sendMessage(chatParser.parse(text));
             return;
         }
 
@@ -50,13 +52,13 @@ public class IgnoreCommand extends Command {
             String text = plugin.config.getString("ignoreSuccess").replace(
                     "%target%",
                     plugin.wrapVariable(args[0]));
-            cs.sendMessage(ChatParser.parse(text));
+            cs.sendMessage(chatParser.parse(text));
         } else {
             ignoreList.remove(toIgnore.getName());
             String text = plugin.config.getString("ignoreUnignore").replace(
                     "%target%",
                     plugin.wrapVariable(args[0]));
-            cs.sendMessage(ChatParser.parse(text));
+            cs.sendMessage(chatParser.parse(text));
         }
         plugin.ignoredPlayers.put(cs.getName(), ignoreList);
     }

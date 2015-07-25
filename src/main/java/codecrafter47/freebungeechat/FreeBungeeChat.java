@@ -16,6 +16,8 @@
  */
 package codecrafter47.freebungeechat;
 
+import codecrafter47.chat.BBCodeChatParser;
+import codecrafter47.chat.ChatParser;
 import codecrafter47.freebungeechat.bukkit.Constants;
 import codecrafter47.freebungeechat.commands.*;
 import com.google.common.base.Charsets;
@@ -56,9 +58,13 @@ public class FreeBungeeChat extends Plugin implements Listener {
 
     public BukkitBridge bukkitBridge;
 
+    private ChatParser chatParser;
+
     @Override
     public void onEnable() {
         instance = this;
+
+        chatParser = new BBCodeChatParser(getLogger());
 
         saveResource("config.yml");
         saveResource("LICENSE");
@@ -86,21 +92,21 @@ public class FreeBungeeChat extends Plugin implements Listener {
         if (config.getBoolean("enableAdminCommand", true)) {
             super.getProxy().getPluginManager().registerCommand(this,
                     new ReloadCommand(this, aliases.get(0), "freebungeechat.admin",
-                            aliases.subList(1, aliases.size()).toArray(new String[aliases.size() - 1])));
+                            chatParser, aliases.subList(1, aliases.size()).toArray(new String[aliases.size() - 1])));
         }
 
         aliases = config.getStringList("messageCommandAliases");
         if (aliases == null || aliases.isEmpty()) aliases = Arrays.asList("w", "msg", "message", "tell", "whisper");
         if (config.getBoolean("enableMessageCommand", true)) {
             super.getProxy().getPluginManager().registerCommand(this, new MessageCommand(this, aliases.get(0), null,
-                    aliases.subList(1, aliases.size()).toArray(new String[aliases.size() - 1])));
+                    chatParser, aliases.subList(1, aliases.size()).toArray(new String[aliases.size() - 1])));
         }
 
         aliases = config.getStringList("replyCommandAliases");
         if (aliases == null || aliases.isEmpty()) aliases = Arrays.asList("reply", "r");
         if (config.getBoolean("enableReplyCommand", true)) {
             super.getProxy().getPluginManager().registerCommand(this, new ReplyCommand(this, aliases.get(0), null,
-                    aliases.subList(1, aliases.size()).toArray(new String[aliases.size() - 1])));
+                    chatParser, aliases.subList(1, aliases.size()).toArray(new String[aliases.size() - 1])));
         }
 
         aliases = config.getStringList("globalChatCommandAliases");
@@ -114,14 +120,14 @@ public class FreeBungeeChat extends Plugin implements Listener {
         if (aliases == null || aliases.isEmpty()) aliases = Arrays.asList("ignore");
         if (config.getBoolean("enableIgnoreCommand", true)) {
             super.getProxy().getPluginManager().registerCommand(this, new IgnoreCommand(this, aliases.get(0), null,
-                    aliases.subList(1, aliases.size()).toArray(new String[aliases.size() - 1])));
+                    chatParser, aliases.subList(1, aliases.size()).toArray(new String[aliases.size() - 1])));
         }
 
         aliases = config.getStringList("conversationCommandAliases");
         if (aliases == null || aliases.isEmpty()) aliases = Arrays.asList("chat");
         if (config.getBoolean("enableConversationCommand", true)) {
             super.getProxy().getPluginManager().registerCommand(this, new ConversationCommand(this, aliases.get(0), null,
-                    aliases.subList(1, aliases.size()).toArray(new String[aliases.size() - 1])));
+                    chatParser, aliases.subList(1, aliases.size()).toArray(new String[aliases.size() - 1])));
         }
 
         aliases = config.getStringList("localChatCommandAliases");
@@ -147,7 +153,7 @@ public class FreeBungeeChat extends Plugin implements Listener {
         }
         AntiSpamData antiSpamData = spamDataMap.get(name);
         if (antiSpamData.isSpamming()) {
-            player.sendMessage(ChatParser.parse(config.getString("antiSpamText",
+            player.sendMessage(chatParser.parse(config.getString("antiSpamText",
                     "&cYou send to many messages. Please wait a minute before sending messages again.")));
             return true;
         }
@@ -180,7 +186,7 @@ public class FreeBungeeChat extends Plugin implements Listener {
                 event.setCancelled(true);
                 return;
             } else {
-                player.sendMessage(ChatParser.parse(config.getString("unknownTarget").replace(
+                player.sendMessage(chatParser.parse(config.getString("unknownTarget").replace(
                         "%target%", wrapVariable(persistentConversations.get(player.getName())))));
                 endConversation(player, true);
             }
@@ -207,11 +213,11 @@ public class FreeBungeeChat extends Plugin implements Listener {
     public void endConversation(ProxiedPlayer player, boolean force) {
         if (force || persistentConversations.containsKey(player.getName())) {
             if(persistentConversations.containsKey(player.getName())) {
-                player.sendMessage(ChatParser.parse(config.getString("endConversation").replace(
+                player.sendMessage(chatParser.parse(config.getString("endConversation").replace(
                         "%target%", wrapVariable(persistentConversations.get(player.getName())))));
                 persistentConversations.remove(player.getName());
             } else {
-                player.sendMessage(ChatParser.parse(config.getString("endConversation").replace(
+                player.sendMessage(chatParser.parse(config.getString("endConversation").replace(
                         "%target%", "nobody")));
             }
         }
@@ -233,7 +239,7 @@ public class FreeBungeeChat extends Plugin implements Listener {
             text = text.replace("%message%", message);
 
             // broadcast message
-            BaseComponent[] msg = ChatParser.parse(text);
+            BaseComponent[] msg = chatParser.parse(text);
             for (ProxiedPlayer target : getProxy().getPlayers()) {
                 if (ignoredPlayers.get(target.getName()) != null && ignoredPlayers.get(target.getName()).contains(player.getName()))
                     continue;
@@ -247,7 +253,7 @@ public class FreeBungeeChat extends Plugin implements Listener {
             }
         } catch (Throwable th) {
             try {
-                player.sendMessage(ChatParser.parse("&cAn internal error occurred while processing your chat message."));
+                player.sendMessage(chatParser.parse("&cAn internal error occurred while processing your chat message."));
             } catch (Throwable ignored) {
                 // maybe the player is offline?
             }
@@ -267,7 +273,7 @@ public class FreeBungeeChat extends Plugin implements Listener {
             text = text.replace("%message%", message);
 
             // broadcast message
-            BaseComponent[] msg = ChatParser.parse(text);
+            BaseComponent[] msg = chatParser.parse(text);
             for (ProxiedPlayer target : getProxy().getPlayers()) {
                 Server server = target.getServer();
                 if (server == null || !excludedServers.contains(server.getInfo().getName())) {
@@ -299,8 +305,12 @@ public class FreeBungeeChat extends Plugin implements Listener {
         return getProxy().getPlayer(t);
     }
 
+    private void saveResource(String name){
+        saveResource(name, false);
+    }
+
     @SneakyThrows
-    private void saveResource(String name) {
+    private void saveResource(String name, boolean force) {
         if (!getDataFolder().exists())
             getDataFolder().mkdir();
 
@@ -352,7 +362,7 @@ public class FreeBungeeChat extends Plugin implements Listener {
             text = ChatColor.stripColor(text);
         }
         if (!player.hasPermission("freebungeechat.chat.bbcode")) {
-            text = ChatParser.stripBBCode(text);
+            text = BBCodeChatParser.stripBBCode(text);
         }
         return text;
     }
@@ -392,14 +402,14 @@ public class FreeBungeeChat extends Plugin implements Listener {
         if (ignoredPlayers.get(target.getName()) != null && ignoredPlayers.get(target.getName()).contains(player.getName())) {
             text = config.getString("ignored").replace(
                     "%target%", wrapVariable(target.getName()));
-            player.sendMessage(ChatParser.parse(text));
+            player.sendMessage(chatParser.parse(text));
             return;
         }
 
         text = preparePlayerChat(text, player);
         text = replaceRegex(text);
 
-        player.sendMessage(ChatParser.parse(
+        player.sendMessage(chatParser.parse(
                 bukkitBridge.replaceVariables(target, bukkitBridge.replaceVariables(player, config.getString("privateMessageSend").replace(
                         "%target%", wrapVariable(target.
                                 getDisplayName())).replace(
@@ -407,7 +417,7 @@ public class FreeBungeeChat extends Plugin implements Listener {
                                 getDisplayName())), ""), "t").replace(
                         "%message%", text)));
 
-        target.sendMessage(ChatParser.parse(
+        target.sendMessage(chatParser.parse(
                 bukkitBridge.replaceVariables(target, bukkitBridge.replaceVariables(player, config.getString("privateMessageReceive").replace(
                         "%target%", wrapVariable(target.
                                 getDisplayName())).replace(
@@ -424,7 +434,7 @@ public class FreeBungeeChat extends Plugin implements Listener {
 
     public void startConversation(ProxiedPlayer player, ProxiedPlayer target) {
         persistentConversations.put(player.getName(), target.getName());
-        player.sendMessage(ChatParser.parse(config.getString("startConversation").replace(
+        player.sendMessage(chatParser.parse(config.getString("startConversation").replace(
                 "%target%", wrapVariable(target.getName()))));
     }
 }
