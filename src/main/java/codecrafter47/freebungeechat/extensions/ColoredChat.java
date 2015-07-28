@@ -22,8 +22,8 @@ import java.util.logging.Level;
 
 public class ColoredChat extends Extension {
     private transient FreeBungeeChat plugin = null;
-    private transient Map<UUID, String> colorMap;
-    private transient Map<UUID, String> effectMap;
+    private transient Map<String, String> colorMap;
+    private transient Map<String, String> effectMap;
 
     private boolean saveColors = true;
     private List<String> colorCommandAliases = Lists.newArrayList("setcolor", "chatcolor");
@@ -123,11 +123,11 @@ public class ColoredChat extends Extension {
 
     private String getPrefix(ProxiedPlayer player) {
         String prefix = "";
-        String color = colorMap.get(player.getUniqueId());
+        String color = colorMap.get(player.getUniqueId().toString());
         if(color != null){
             prefix += color;
         }
-        String effect = effectMap.get(player.getUniqueId());
+        String effect = effectMap.get(player.getUniqueId().toString());
         if(effect != null){
             prefix += effect;
         }
@@ -147,7 +147,7 @@ public class ColoredChat extends Extension {
         if (saveFile.exists()) {
             try {
                 Yaml yaml = new Yaml();
-                Map<String, Map<UUID, String>> data = (Map<String, Map<UUID, String>>) yaml.load(new InputStreamReader(new FileInputStream(saveFile), Charsets.UTF_8));
+                Map<String, Map<String, String>> data = (Map<String, Map<String, String>>) yaml.load(new InputStreamReader(new FileInputStream(saveFile), Charsets.UTF_8));
                 colorMap.putAll(data.get("colorMap"));
                 effectMap.putAll(data.get("effectMap"));
             } catch (Throwable th) {
@@ -158,7 +158,7 @@ public class ColoredChat extends Extension {
 
     private void saveData() {
         File saveFile = new File(plugin.getDataFolder(), "chatColors.yml");
-        Map<String, Map<UUID, String>> data = new HashMap<>();
+        Map<String, Map<String, String>> data = new HashMap<>();
         data.put("colorMap", colorMap);
         data.put("effectMap", effectMap);
         try {
@@ -221,10 +221,10 @@ public class ColoredChat extends Extension {
                 return;
             }
             if(chatColor == ChatColor.RESET){
-                colorMap.put(player.getUniqueId(), "");
+                colorMap.put(player.getUniqueId().toString(), "");
                 player.sendMessage(plugin.getChatParser().parse(msgNotColored));
             } else {
-                colorMap.put(player.getUniqueId(), chatColor.toString());
+                colorMap.put(player.getUniqueId().toString(), chatColor.toString());
                 player.sendMessage(new ComponentBuilder("Your chat is now colored in ").append(chatColor.getName()).color(chatColor).append("!", ComponentBuilder.FormatRetention.NONE).create());
             }
         }
@@ -276,10 +276,10 @@ public class ColoredChat extends Extension {
                 return;
             }
             if(chatColor == ChatColor.RESET){
-                effectMap.put(player.getUniqueId(), "");
+                effectMap.put(player.getUniqueId().toString(), "");
                 player.sendMessage(plugin.getChatParser().parse(msgNoEffect));
             } else {
-                effectMap.put(player.getUniqueId(), chatColor.toString());
+                effectMap.put(player.getUniqueId().toString(), chatColor.toString());
                 player.sendMessage(new ComponentBuilder("Your chat is now ").append(chatColor.getName()).color(chatColor).append("!", ComponentBuilder.FormatRetention.NONE).create());
             }
         }
