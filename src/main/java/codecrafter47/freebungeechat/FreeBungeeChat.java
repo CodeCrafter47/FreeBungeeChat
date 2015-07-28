@@ -25,6 +25,7 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import lombok.Getter;
 import lombok.SneakyThrows;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -60,6 +61,7 @@ public class FreeBungeeChat extends Plugin implements Listener {
 
     public BukkitBridge bukkitBridge;
 
+    @Getter
     private ChatParser chatParser;
     private final List<MessagePreProcessor> messagePreProcessorList = Lists.newLinkedList();
 

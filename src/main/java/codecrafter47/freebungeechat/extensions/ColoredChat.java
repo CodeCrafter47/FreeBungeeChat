@@ -23,13 +23,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
 public class ColoredChat extends Extension {
-    private transient Plugin plugin = null;
+    private transient FreeBungeeChat plugin = null;
     private transient Map<UUID, String> colorMap;
     private transient Map<UUID, String> effectMap;
 
     private boolean saveColors = true;
     private List<String> colorCommandAliases = Lists.newArrayList("setcolor", "chatcolor");
     private List<String> effectCommandAliases = Lists.newArrayList("seteffect", "chateffect");
+    private String msgNotColored = "You chat is not colored anymore.";
+    private String msgNoEffect = "Your chat is clear from any effects.";
 
     private static Set<ChatColor> colors = Sets.newLinkedHashSet(Arrays.asList(
             ChatColor.BLACK,
@@ -81,6 +83,22 @@ public class ColoredChat extends Extension {
 
     public void setEffectCommandAliases(List<String> effectCommandAliases) {
         this.effectCommandAliases = effectCommandAliases;
+    }
+
+    public String getMsgNotColored() {
+        return msgNotColored;
+    }
+
+    public void setMsgNotColored(String msgNotColored) {
+        this.msgNotColored = msgNotColored;
+    }
+
+    public String getMsgNoEffect() {
+        return msgNoEffect;
+    }
+
+    public void setMsgNoEffect(String msgNoEffect) {
+        this.msgNoEffect = msgNoEffect;
     }
 
     @Override
@@ -203,7 +221,7 @@ public class ColoredChat extends Extension {
             }
             if(chatColor == ChatColor.RESET){
                 colorMap.put(player.getUniqueId(), "");
-                player.sendMessage(new TextComponent("You chat is not colored anymore."));
+                player.sendMessage(plugin.getChatParser().parse(msgNotColored));
             } else {
                 colorMap.put(player.getUniqueId(), chatColor.toString());
                 player.sendMessage(new ComponentBuilder("Your chat is now colored in ").append(chatColor.getName()).color(chatColor).append("!", ComponentBuilder.FormatRetention.NONE).create());
@@ -255,7 +273,7 @@ public class ColoredChat extends Extension {
             }
             if(chatColor == ChatColor.RESET){
                 effectMap.put(player.getUniqueId(), "");
-                player.sendMessage(new TextComponent("Your chat doesn't is clear from any effects."));
+                player.sendMessage(plugin.getChatParser().parse(msgNoEffect));
             } else {
                 effectMap.put(player.getUniqueId(), chatColor.toString());
                 player.sendMessage(new ComponentBuilder("Your chat is now ").append(chatColor.getName()).color(chatColor).append("!", ComponentBuilder.FormatRetention.NONE).create());

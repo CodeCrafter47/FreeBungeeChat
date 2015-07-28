@@ -165,6 +165,8 @@ extensions: []
 #    colorCommandAliases: ['setcolor', 'chatcolor']
 #    effectCommandAliases: ['seteffect', 'chateffect']
 #    saveColors: true # whether to save users chatcolors between restarts
+#    msgNotColored: "You chat is not colored anymore."
+#    msgNoEffect: "Your chat is clear from any effects."
 
 ###########################################################
 # ONLY EDIT BELOW SETTINGS IF YOU KNOW WHAT YOU ARE DOING #

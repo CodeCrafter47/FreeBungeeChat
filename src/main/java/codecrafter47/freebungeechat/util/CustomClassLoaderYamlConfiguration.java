@@ -6,6 +6,7 @@ import net.md_5.bungee.config.ConfigurationProvider;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
+import org.yaml.snakeyaml.introspector.PropertyUtils;
 import org.yaml.snakeyaml.representer.Representer;
 
 import java.io.*;
@@ -19,7 +20,11 @@ public class CustomClassLoaderYamlConfiguration extends ConfigurationProvider {
         protected Yaml initialValue() {
             DumperOptions options = new DumperOptions();
             options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-            return new Yaml(new CustomClassLoaderConstructor(getClass().getClassLoader()), new Representer(), options);
+            CustomClassLoaderConstructor constructor = new CustomClassLoaderConstructor(getClass().getClassLoader());
+            PropertyUtils propertyUtils = constructor.getPropertyUtils();
+            propertyUtils.setSkipMissingProperties(true);
+            constructor.setPropertyUtils(propertyUtils);
+            return new Yaml(constructor, new Representer(), options);
         }
     };
 
@@ -102,7 +107,7 @@ public class CustomClassLoaderYamlConfiguration extends ConfigurationProvider {
             map = new LinkedHashMap();
         }
 
-        return constructConfiguration((Map)map, defaults);
+        return constructConfiguration((Map) map, defaults);
     }
 
     @SneakyThrows
@@ -122,7 +127,7 @@ public class CustomClassLoaderYamlConfiguration extends ConfigurationProvider {
             map = new LinkedHashMap();
         }
 
-        return constructConfiguration((Map)map, defaults);
+        return constructConfiguration((Map) map, defaults);
     }
 
     public Configuration load(String string) {
@@ -135,6 +140,6 @@ public class CustomClassLoaderYamlConfiguration extends ConfigurationProvider {
             map = new LinkedHashMap();
         }
 
-        return constructConfiguration((Map)map, defaults);
+        return constructConfiguration((Map) map, defaults);
     }
 }
