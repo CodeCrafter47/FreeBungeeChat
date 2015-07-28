@@ -21,6 +21,10 @@ package codecrafter47.freebungeechat;
 import codecrafter47.freebungeechat.bukkit.Constants;
 import lombok.SneakyThrows;
 import lombok.Synchronized;
+import net.alpenblock.bungeeperms.BungeePerms;
+import net.alpenblock.bungeeperms.Group;
+import net.alpenblock.bungeeperms.PermissionsManager;
+import net.alpenblock.bungeeperms.User;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.event.PluginMessageEvent;
@@ -129,11 +133,69 @@ public class BukkitBridge implements Listener {
             throw new RuntimeException("Unable to process chat message from " + player.getName() + " make sure you have installed FreeBungeeChat on " + (player.getServer() != null ? player.getServer().getInfo().getName() : "(unknown server)"));
         }
         text = text.replace("%" + prefix + "server%", plugin.wrapVariable(player.getServer() != null ? player.getServer().getInfo().getName() : "unknown"));
+        text = text.replace("%" + prefix + "BungeePerms_Prefix%", plugin.wrapVariable(getBungeePermsPrefix(player)));
+        text = text.replace("%" + prefix + "BungeePerms_Suffix%", plugin.wrapVariable(getBungeePermsSuffix(player)));
+        text = text.replace("%" + prefix + "BungeePerms_Group%", plugin.wrapVariable(getBungeePermsGroup(player)));
         return text;
     }
 
     @Synchronized
     private int getId() {
         return cnt++;
+    }
+
+    private boolean isBungeePermsAvailable() {
+        return plugin.getProxy().getPluginManager().getPlugin("BungeePerms") != null;
+    }
+
+    private String getBungeePermsPrefix(ProxiedPlayer player) {
+        if (isBungeePermsAvailable()) {
+            BungeePerms bungeePerms = BungeePerms.getInstance();
+            if (bungeePerms != null) {
+                PermissionsManager pm = bungeePerms.getPermissionsManager();
+                if (pm != null) {
+                    User user = pm.getUser(player.getName());
+                    if (user != null) {
+                        return user.buildPrefix();
+                    }
+                }
+            }
+        }
+        return "";
+    }
+
+    private String getBungeePermsSuffix(ProxiedPlayer player) {
+        if (isBungeePermsAvailable()) {
+            BungeePerms bungeePerms = BungeePerms.getInstance();
+            if (bungeePerms != null) {
+                PermissionsManager pm = bungeePerms.getPermissionsManager();
+                if (pm != null) {
+                    User user = pm.getUser(player.getName());
+                    if (user != null) {
+                        return user.buildSuffix();
+                    }
+                }
+            }
+        }
+        return "";
+    }
+
+    private String getBungeePermsGroup(ProxiedPlayer player) {
+        if (isBungeePermsAvailable()) {
+            BungeePerms bungeePerms = BungeePerms.getInstance();
+            if (bungeePerms != null) {
+                PermissionsManager pm = bungeePerms.getPermissionsManager();
+                if (pm != null) {
+                    User user = pm.getUser(player.getName());
+                    if (user != null) {
+                        Group mainGroup = pm.getMainGroup(user);
+                        if (mainGroup != null) {
+                            return mainGroup.getName();
+                        }
+                    }
+                }
+            }
+        }
+        return "";
     }
 }
