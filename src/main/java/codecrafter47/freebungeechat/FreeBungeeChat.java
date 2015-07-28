@@ -246,11 +246,11 @@ public class FreeBungeeChat extends Plugin implements Listener {
                 return;
             }
             message = preparePlayerChat(message, player);
+            message = replaceRegex(message);
+            message = applyTagLogic(message);
             for (MessagePreProcessor function : messagePreProcessorList) {
                 message = function.apply(player, message);
             }
-            message = replaceRegex(message);
-            message = applyTagLogic(message);
 
             // replace variables
             String text = config.getString("chatFormat").replace("%player%",
