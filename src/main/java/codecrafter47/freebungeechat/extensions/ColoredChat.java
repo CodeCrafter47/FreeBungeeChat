@@ -11,6 +11,7 @@ import com.google.common.collect.Sets;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -46,7 +47,8 @@ public class ColoredChat extends Extension {
             ChatColor.RED,
             ChatColor.LIGHT_PURPLE,
             ChatColor.YELLOW,
-            ChatColor.WHITE
+            ChatColor.WHITE,
+            ChatColor.RESET
     ));
     private static Set<ChatColor> effects = Sets.newLinkedHashSet(Arrays.asList(
             ChatColor.MAGIC,
@@ -195,12 +197,17 @@ public class ColoredChat extends Extension {
                 return;
             }
             String permission = String.format("freebungeechat.chatcolor.color.%s", chatColor.getName().toLowerCase());
-            if(!player.hasPermission(permission)){
+            if(chatColor != ChatColor.RESET && !player.hasPermission(permission)){
                 player.sendMessage(new ComponentBuilder("To use this color you require the permission ").color(ChatColor.RED).append(permission).append(" which you don't have.").create());
                 return;
             }
-            colorMap.put(player.getUniqueId(), chatColor.toString());
-            player.sendMessage(new ComponentBuilder("Your chat is now colored in ").append(chatColor.getName()).color(chatColor).append("!", ComponentBuilder.FormatRetention.NONE).create());
+            if(chatColor == ChatColor.RESET){
+                colorMap.put(player.getUniqueId(), "");
+                player.sendMessage(new TextComponent("You chat is not colored anymore."));
+            } else {
+                colorMap.put(player.getUniqueId(), chatColor.toString());
+                player.sendMessage(new ComponentBuilder("Your chat is now colored in ").append(chatColor.getName()).color(chatColor).append("!", ComponentBuilder.FormatRetention.NONE).create());
+            }
         }
     }
 
@@ -242,12 +249,17 @@ public class ColoredChat extends Extension {
                 return;
             }
             String permission = String.format("freebungeechat.chatcolor.effect.%s", chatColor.getName().toLowerCase());
-            if(!player.hasPermission(permission)){
+            if(chatColor != ChatColor.RESET && !player.hasPermission(permission)){
                 player.sendMessage(new ComponentBuilder("To use this effect you require the permission ").color(ChatColor.RED).append(permission).append(" which you don't have.").create());
                 return;
             }
-            effectMap.put(player.getUniqueId(), chatColor.toString());
-            player.sendMessage(new ComponentBuilder("Your chat is now ").append(chatColor.getName()).color(chatColor).append("!", ComponentBuilder.FormatRetention.NONE).create());
+            if(chatColor == ChatColor.RESET){
+                effectMap.put(player.getUniqueId(), "");
+                player.sendMessage(new TextComponent("Your chat doesn't is clear from any effects."));
+            } else {
+                effectMap.put(player.getUniqueId(), chatColor.toString());
+                player.sendMessage(new ComponentBuilder("Your chat is now ").append(chatColor.getName()).color(chatColor).append("!", ComponentBuilder.FormatRetention.NONE).create());
+            }
         }
     }
 }
