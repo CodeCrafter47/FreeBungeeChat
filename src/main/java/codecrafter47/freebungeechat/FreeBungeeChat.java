@@ -20,9 +20,11 @@ import codecrafter47.chat.BBCodeChatParser;
 import codecrafter47.chat.ChatParser;
 import codecrafter47.freebungeechat.bukkit.Constants;
 import codecrafter47.freebungeechat.commands.*;
+import codecrafter47.freebungeechat.extensions.Extension;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import lombok.SneakyThrows;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -35,7 +37,7 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
-import net.md_5.bungee.config.YamlConfiguration;
+import codecrafter47.freebungeechat.util.CustomClassLoaderYamlConfiguration;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
 
@@ -59,6 +61,7 @@ public class FreeBungeeChat extends Plugin implements Listener {
     public BukkitBridge bukkitBridge;
 
     private ChatParser chatParser;
+    private final List<MessagePreProcessor> messagePreProcessorList = Lists.newLinkedList();
 
     @Override
     public void onEnable() {
@@ -71,7 +74,7 @@ public class FreeBungeeChat extends Plugin implements Listener {
         saveResource("readme.md");
 
         try {
-            config = ConfigurationProvider.getProvider(YamlConfiguration.class).load(new InputStreamReader(new FileInputStream(new File(getDataFolder(), "config.yml")), Charsets.UTF_8));
+            config = new CustomClassLoaderYamlConfiguration().load(new InputStreamReader(new FileInputStream(new File(getDataFolder(), "config.yml")), Charsets.UTF_8));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -135,6 +138,20 @@ public class FreeBungeeChat extends Plugin implements Listener {
         if (config.getBoolean("enableLocalChatCommand", false)) {
             super.getProxy().getPluginManager().registerCommand(this, new LocalChatCommand(this, aliases.get(0), null,
                     aliases.subList(1, aliases.size()).toArray(new String[aliases.size() - 1])));
+        }
+
+        // load extensiond
+        List<Extension> extensions = (List<Extension>) config.getList("extensions");
+        for (Extension extension : extensions) {
+            extension.onEnable(this);
+        }
+    }
+
+    @Override
+    public void onDisable() {
+        List<Extension> extensions = (List<Extension>) config.getList("extensions");
+        for (Extension extension : extensions) {
+            extension.onDisable();
         }
     }
 
@@ -364,11 +381,14 @@ public class FreeBungeeChat extends Plugin implements Listener {
         if (!player.hasPermission("freebungeechat.chat.bbcode")) {
             text = BBCodeChatParser.stripBBCode(text);
         }
+        for (MessagePreProcessor function : messagePreProcessorList) {
+            text = function.apply(player, text);
+        }
         return text;
     }
 
     public void reloadConfig() throws FileNotFoundException {
-        config = ConfigurationProvider.getProvider(YamlConfiguration.class).load(new InputStreamReader(new FileInputStream(new File(getDataFolder(), "config.yml")), Charsets.UTF_8));
+        config = ConfigurationProvider.getProvider(CustomClassLoaderYamlConfiguration.class).load(new InputStreamReader(new FileInputStream(new File(getDataFolder(), "config.yml")), Charsets.UTF_8));
         if (config.getStringList("excludeServers") != null) {
             excludedServers = config.getStringList("excludeServers");
         }
@@ -436,5 +456,9 @@ public class FreeBungeeChat extends Plugin implements Listener {
         persistentConversations.put(player.getName(), target.getName());
         player.sendMessage(chatParser.parse(config.getString("startConversation").replace(
                 "%target%", wrapVariable(target.getName()))));
+    }
+
+    public void registerMessagePreprocessor(MessagePreProcessor function){
+        messagePreProcessorList.add(function);
     }
 }

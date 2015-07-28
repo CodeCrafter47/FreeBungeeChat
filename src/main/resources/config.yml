@@ -126,6 +126,46 @@ conversationCommandAliases: ['chat', 'conversation']
 startConversation: "&aYou started a conversation with %target%. All your chat messages will go directly to %target%."
 endConversation: "&cYour conversation with %target% is over. Chat works as normal again."
 
+# Extensions
+# ==========
+# Extensions are optional features you can enable or disable if you like.
+# Currently there's only one but there might be more in feature
+extensions: []
+# The ColoredChat extension allows players to set the color for their chat using /setcolor or /seteffect
+# Uncomment to use an comment the above line
+# Permissions for the commands:
+# freebungeechat.command.chatcolor
+# freebungeechat.command.chateffect
+# Permissions for colors:
+# freebungeechat.chatcolor.color.black
+# freebungeechat.chatcolor.color.dark_blue
+# freebungeechat.chatcolor.color.dark_green
+# freebungeechat.chatcolor.color.dark_aqua
+# freebungeechat.chatcolor.color.dark_red
+# freebungeechat.chatcolor.color.dark_purple
+# freebungeechat.chatcolor.color.gold
+# freebungeechat.chatcolor.color.gray
+# freebungeechat.chatcolor.color.dark_gray
+# freebungeechat.chatcolor.color.blue
+# freebungeechat.chatcolor.color.green
+# freebungeechat.chatcolor.color.aqua
+# freebungeechat.chatcolor.color.red
+# freebungeechat.chatcolor.color.light_purple
+# freebungeechat.chatcolor.color.yellow
+# freebungeechat.chatcolor.color.white
+# Permissions for effects
+# freebungeechat.chatcolor.effect.obfuscated
+# freebungeechat.chatcolor.effect.bold
+# freebungeechat.chatcolor.effect.strikethrough
+# freebungeechat.chatcolor.effect.underline
+# freebungeechat.chatcolor.effect.italic
+# freebungeechat.chatcolor.effect.reset
+#extensions:
+#  - !!codecrafter47.freebungeechat.extensions.ColoredChat
+#    colorCommandAliases: ['setcolor', 'chatcolor']
+#    effectCommandAliases: ['seteffect', 'chateffect']
+#    saveColors: true # whether to save users chatcolors between restarts
+
 ###########################################################
 # ONLY EDIT BELOW SETTINGS IF YOU KNOW WHAT YOU ARE DOING #
 ###########################################################
