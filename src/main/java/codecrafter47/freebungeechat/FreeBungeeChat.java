@@ -246,6 +246,9 @@ public class FreeBungeeChat extends Plugin implements Listener {
                 return;
             }
             message = preparePlayerChat(message, player);
+            for (MessagePreProcessor function : messagePreProcessorList) {
+                message = function.apply(player, message);
+            }
             message = replaceRegex(message);
             message = applyTagLogic(message);
 
@@ -380,9 +383,6 @@ public class FreeBungeeChat extends Plugin implements Listener {
         }
         if (!player.hasPermission("freebungeechat.chat.bbcode")) {
             text = BBCodeChatParser.stripBBCode(text);
-        }
-        for (MessagePreProcessor function : messagePreProcessorList) {
-            text = function.apply(player, text);
         }
         return text;
     }
