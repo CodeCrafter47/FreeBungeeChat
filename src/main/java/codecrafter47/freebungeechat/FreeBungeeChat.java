@@ -141,7 +141,7 @@ public class FreeBungeeChat extends Plugin implements Listener {
         }
 
         // load extensiond
-        List<Extension> extensions = (List<Extension>) config.getList("extensions");
+        List<Extension> extensions = (List<Extension>) config.getList("extensions", Collections.emptyList());
         for (Extension extension : extensions) {
             extension.onEnable(this);
         }
@@ -149,7 +149,7 @@ public class FreeBungeeChat extends Plugin implements Listener {
 
     @Override
     public void onDisable() {
-        List<Extension> extensions = (List<Extension>) config.getList("extensions");
+        List<Extension> extensions = (List<Extension>) config.getList("extensions", Collections.emptyList());
         for (Extension extension : extensions) {
             extension.onDisable();
         }
