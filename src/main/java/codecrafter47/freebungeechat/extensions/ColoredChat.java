@@ -11,10 +11,8 @@ import com.google.common.collect.Sets;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
-import net.md_5.bungee.api.plugin.Plugin;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
@@ -204,7 +202,10 @@ public class ColoredChat extends Extension {
             } else if (args[0].length() == 2) {
                 chatColor = ChatColor.getByChar(args[0].toLowerCase().charAt(1));
             } else {
-                chatColor = ChatColor.valueOf(args[0].toUpperCase());
+                try {
+                    chatColor = ChatColor.valueOf(args[0].toUpperCase());
+                } catch (Throwable ignored) {
+                }
             }
             if(chatColor == null){
                 player.sendMessage(new ComponentBuilder(String.format("Unknown color '%s'", args[0])).color(ChatColor.RED).create());
@@ -256,7 +257,10 @@ public class ColoredChat extends Extension {
             } else if (args[0].length() == 2) {
                 chatColor = ChatColor.getByChar(args[0].toLowerCase().charAt(1));
             } else {
-                chatColor = ChatColor.valueOf(args[0].toUpperCase());
+                try {
+                    chatColor = ChatColor.valueOf(args[0].toUpperCase());
+                } catch (Throwable ignored) {
+                }
             }
             if(chatColor == null){
                 player.sendMessage(new ComponentBuilder(String.format("Unknown color '%s'", args[0])).color(ChatColor.RED).create());
