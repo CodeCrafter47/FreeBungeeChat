@@ -388,7 +388,7 @@ public class FreeBungeeChat extends Plugin implements Listener {
     }
 
     public void reloadConfig() throws FileNotFoundException {
-        config = ConfigurationProvider.getProvider(CustomClassLoaderYamlConfiguration.class).load(new InputStreamReader(new FileInputStream(new File(getDataFolder(), "config.yml")), Charsets.UTF_8));
+        config = new CustomClassLoaderYamlConfiguration().load(new InputStreamReader(new FileInputStream(new File(getDataFolder(), "config.yml")), Charsets.UTF_8));
         if (config.getStringList("excludeServers") != null) {
             excludedServers = config.getStringList("excludeServers");
         }
