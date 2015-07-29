@@ -73,10 +73,16 @@ regex:
     - search: '\(o\)|\(O\)|\(time\)'
       replace: "\u231A"
     - search: '\(rain\)'
-      replace: "\u2602"
+      replace: "░"
     - search: '\(sun\)'
-      replace: "\u2600"
-    - search: '\(\*\)'
+      replace: "☀"
+    - search: '\(cloud\)'
+      replace: "☁"
+    - search: '\(snow\)'
+      replace: "\u2638"
+    - search: '\(snowman\)'
+      replace: "☃"
+    - search: '\(\*\)|\(star\)'
       replace: "\u2605"
     - search: ':\)|:=\)|:-\)'
       replace: "\u263A"
@@ -86,6 +92,92 @@ regex:
       replace: "\u263B"
     - search: '<3'
       replace: "\u2764"
+    - search: '\(0\)'
+      replace: "⓪"
+    - search: '\(1\)'
+      replace: "①"
+    - search: '\(2\)'
+      replace: "②"
+    - search: '\(3\)'
+      replace: "③"
+    - search: '\(4\)'
+      replace: "④"
+    - search: '\(5\)'
+      replace: "⑤"
+    - search: '\(6\)'
+      replace: "⑥"
+    - search: '\(7\)'
+      replace: "⑦"
+    - search: '\(8\)'
+      replace: "⑧"
+    - search: '\(9\)'
+      replace: "⑨"
+    - search: '\(g\)'
+      replace: "ⓖ"
+    - search: '\(G\)'
+      replace: "Ⓖ"
+    - search: '\(at\)'
+      replace: "@"
+    - search: '\(tm\)'
+      replace: "™"
+    - search: '\(bullet\)'
+      replace: "•"
+    - search: '\(male\)'
+      replace: "♂"
+    - search: '\(female\)'
+      replace: "♀"
+    - search: '\(radiation\)'
+      replace: "☣"
+    - search: '\(correct\)'
+      replace: "✔"
+    - search: '\(wrong\)|\(incorrect\)'
+      replace: "✗"
+    - search: '\(pencil\)'
+      replace: "✎"
+    - search: '\(mail\)|\(letter\)'
+      replace: "✉"
+    - search: '\(peace\)'
+      replace: "✌"
+    - search: '\(illuminati\)'
+      replace: "◬"
+    - search: '\(club\)'
+      replace: "♣"
+    - search: '\(spades\)'
+      replace: "♠"
+    - search: '\(heart\)'
+      replace: "♥"
+    - search: '\(diams\)'
+      replace: "♦"
+    - search: '\(up\)'
+      replace: "↑"
+    - search: '\(down\)'
+      replace: "↓"
+    - search: '\(left\)'
+      replace: "←"
+    - search: '\(right\)'
+      replace: "→"
+    - search: '\(airplane\)|\(plane\)'
+      replace: "✈"
+    - search: '\(scissors\)'
+      replace: "✄"
+    - search: '\(circle\)'
+      replace: "◯"
+    - search: '\(coffee\)'
+      replace: "☕"
+    - search: '\(flower\)'
+      replace: "❁"
+    - search: '\(cube1\)'
+      replace: "⚀"
+    - search: '\(cube2\)'
+      replace: "⚁"
+    - search: '\(cube3\)'
+      replace: "⚂"
+    - search: '\(cube4\)'
+      replace: "⚃"
+    - search: '\(cube5\)'
+      replace: "⚄"
+    - search: '\(cube6\)'
+      replace: "⚅"
 # underline clickable things
     - search: '(?i)(?=(\[(?:url|command|suggest)(?:=(?<cmd>(?:(?:[^]\[]*)\[(?:[^]\[]*)\])*(?:[^]\[]*)))?\]))'
       replace: "[u]"
