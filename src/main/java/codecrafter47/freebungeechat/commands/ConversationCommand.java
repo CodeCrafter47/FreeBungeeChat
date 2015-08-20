@@ -1,6 +1,6 @@
 package codecrafter47.freebungeechat.commands;
 
-import codecrafter47.chat.ChatParser;
+import codecrafter47.util.chat.ChatParser;
 import codecrafter47.freebungeechat.FreeBungeeChat;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;

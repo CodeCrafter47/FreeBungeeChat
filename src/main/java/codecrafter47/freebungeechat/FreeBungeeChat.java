@@ -16,8 +16,8 @@
  */
 package codecrafter47.freebungeechat;
 
-import codecrafter47.chat.BBCodeChatParser;
-import codecrafter47.chat.ChatParser;
+import codecrafter47.util.chat.BBCodeChatParser;
+import codecrafter47.util.chat.ChatParser;
 import codecrafter47.freebungeechat.bukkit.Constants;
 import codecrafter47.freebungeechat.commands.*;
 import codecrafter47.freebungeechat.extensions.Extension;
