@@ -32,6 +32,7 @@ public class IgnoreCommand extends Command {
 
         if (args.length != 1) {
             cs.sendMessage("/ignore <player>");
+            return;
         }
 
         ProxiedPlayer toIgnore = plugin.getProxy().getPlayer(args[0]);
