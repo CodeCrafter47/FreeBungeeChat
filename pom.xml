@@ -6,7 +6,7 @@
 
     <groupId>codecrafter47.freebungeechat</groupId>
     <artifactId>FreeBungeeChat</artifactId>
-    <version>2.4-SNAPSHOT</version>
+    <version>3.0-SNAPSHOT</version>
 
 
     <repositories>
