@@ -2,7 +2,7 @@
 # read readme.md for more information
 
 # you can use %player%
-chatFormat: "&b[suggest=/w %player% ]%player%[/suggest] &f> %message%"
+chatFormat: "&b[suggest=/w %player% ][hover=&7Message&r %player%]%player%[/hover][/suggest] &f> %message%"
 
 # you can use %target%
 unknownTarget: "&c%target% is not on the server"
