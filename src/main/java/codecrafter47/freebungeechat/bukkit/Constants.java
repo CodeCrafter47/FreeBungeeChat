@@ -21,22 +21,6 @@ package codecrafter47.freebungeechat.bukkit;
  */
 public class Constants {
 
-    public final static String channel = "FreeBungeeChat";
-
-    public final static String subchannel_init = "init";
-
-    public final static String subchannel_initplayer = "initplayer";
-
-    public final static String subchannel_update = "update";
-
-    public final static String subchannel_updateplayer = "updateplayer";
-
-    public final static String subchannel_playSound = "playsound";
-
-    public final static String subchannel_chatMsg = "chat";
-
-    public final static int updateDelay = 10;
-
-    public final static int completeUpdateDelay = 6000;
+    public final static String channel = "FreeBungeeChat 3";
 
 }

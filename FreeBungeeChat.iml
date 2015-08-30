@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
-  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_7" inherit-compiler-output="false">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/target/classes" />
     <output-test url="file://$MODULE_DIR$/target/test-classes" />
     <content url="file://$MODULE_DIR$">
@@ -40,6 +40,16 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.sk89q:jchronic:0.2.4a" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: net.milkbowl.vault:Vault:1.2.32" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: net.ess3:Essentials:2.13.1" level="project" />
+    <orderEntry type="library" name="Maven: codecrafter47.util.data.bukkit:data-bukkit:1.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: codecrafter47.util.data:data-core:1.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: codecrafter47.util.data.bukkit:data-bukkit-vault:1.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: codecrafter47.util.data.bukkit:data-bukkit-vanishnopacket:1.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: codecrafter47.util.data.bukkit:data-bukkit-playerpoints:1.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: codecrafter47.util.data.bukkit:data-bukkit-factions-2.7.5:1.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: codecrafter47.util.data.bukkit:data-bukkit-factionsuuid:1.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: codecrafter47.util.data.bukkit:data-bukkit-supervanish:1.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: codecrafter47.util.data.bukkit:data-bukkit-simpleclans:1.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: codecrafter47.util.data.bukkit:data-bukkit-essentials:1.0-SNAPSHOT" level="project" />
   </component>
   <component name="org.twodividedbyzero.idea.findbugs">
     <option name="_basePreferences">

@@ -19,6 +19,11 @@
 package codecrafter47.freebungeechat;
 
 import codecrafter47.freebungeechat.bukkit.Constants;
+import codecrafter47.freebungeechat.bukkit.FreeBungeeChatBukkit;
+import codecrafter47.freebungeechat.tasks.BukkitTask;
+import codecrafter47.freebungeechat.tasks.BungeeTask;
+import codecrafter47.freebungeechat.tasks.bukkit.PlaySoundTask;
+import codecrafter47.freebungeechat.tasks.bukkit.ReplaceVariablesTask;
 import lombok.SneakyThrows;
 import lombok.Synchronized;
 import net.alpenblock.bungeeperms.BungeePerms;
@@ -32,9 +37,9 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 
 import java.io.*;
+import java.lang.reflect.Constructor;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author Florian Stober
@@ -43,7 +48,7 @@ public class BukkitBridge implements Listener {
 
     FreeBungeeChat plugin;
 
-    ConcurrentHashMap<Integer, String> buf = new ConcurrentHashMap<>();
+    public ConcurrentHashMap<Integer, String> buf = new ConcurrentHashMap<>();
 
     int cnt = 0;
 
@@ -63,74 +68,64 @@ public class BukkitBridge implements Listener {
                     getSender() instanceof Server) {
                 try {
                     ProxiedPlayer player = (ProxiedPlayer) event.getReceiver();
+                    Server server = (Server) event.getSender();
 
-                    DataInputStream in = new DataInputStream(
+                    ObjectInputStream in = new ObjectInputStream(
                             new ByteArrayInputStream(event.getData()));
-
-                    String subchannel = in.readUTF();
-
-                    if (subchannel.equals(Constants.subchannel_chatMsg)) {
-                        buf.put(in.readInt(), in.readUTF());
+                    Object object = in.readObject();
+                    Class c = Class.forName((String) object);
+                    Constructor[] constructors = c.getConstructors();
+                    if (constructors.length == 1) {
+                        Object[] args = (Object[]) in.readObject();
+                        BungeeTask task = (BungeeTask) constructors[0].newInstance(args);
+                        task.execute(plugin, player, server);
+                    } else {
+                        plugin.getLogger().severe("received invalid task from bukkit server (" + server.getInfo().getName() + "): " + c);
                     }
 
-                } catch (IOException ex) {
-                    plugin.getLogger().log(Level.SEVERE,
-                            "Exception while parsing data from Bukkit", ex);
+                } catch (Throwable th) {
+                    plugin.getLogger().log(Level.SEVERE, "Exception while parsing data from Bukkit", th);
                 }
             }
         }
     }
 
     public void playSound(ProxiedPlayer player, String sound) {
+        executeOnBukkit(player, PlaySoundTask.class, sound);
+    }
+
+    public void executeOnBukkit(ProxiedPlayer player, Class<? extends BukkitTask> task, Object... args){
         try {
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            DataOutputStream outputStream1 = new DataOutputStream(outputStream);
-            outputStream1.writeUTF(Constants.subchannel_playSound);
-            outputStream1.writeUTF(sound);
-            outputStream1.flush();
-            outputStream1.close();
-            player.getServer().sendData(Constants.channel, outputStream.toByteArray());
-        } catch (IOException ex) {
-            Logger.getLogger(BukkitBridge.class.getName()).
-                    log(Level.SEVERE, null, ex);
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            ObjectOutputStream os = new ObjectOutputStream(out);
+            os.writeObject(task.getName());
+            os.writeObject(args);
+            os.flush();
+            os.close();
+            player.getServer().sendData(Constants.channel, out.toByteArray());
+        } catch (Throwable th){
+            plugin.getLogger().log(Level.SEVERE, "Failed to execute task " + task + " for player " + player.getName());
         }
     }
 
     @SneakyThrows
     public String replaceVariables(ProxiedPlayer player, String text, String prefix) {
-        int tries = 0;
-        while (text.matches("^.*%" + prefix + "(group|prefix(color)?|suffix|balance|currency|currencyPl|tabName|displayName|world|health|level)%.*$")
-                && tries < 3) {
+        if (text.matches("^.*%" + prefix + "(group|prefix(color)?|suffix|balance|currency|currencyPl|tabName|displayName|world|health|level|faction)%.*$")) {
             try {
                 int id = getId();
                 if (buf.containsKey(id)) buf.remove(id);
-                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                DataOutputStream outputStream1 = new DataOutputStream(outputStream);
-                outputStream1.writeUTF(Constants.subchannel_chatMsg);
-                outputStream1.writeUTF(text);
-                outputStream1.writeUTF(prefix);
-                outputStream1.writeInt(id);
-                outputStream1.writeBoolean(plugin.config.getBoolean("allowBBCodeInVariables", false));
-                outputStream1.flush();
-                outputStream1.close();
-                player.getServer().sendData(Constants.channel, outputStream.toByteArray());
-                for (int i = 0; i < 10 && !buf.containsKey(id); i++) {
+
+                executeOnBukkit(player, ReplaceVariablesTask.class, text, prefix, id, plugin.config.getBoolean("allowBBCodeInVariables", false));
+                for (int i = 0; i < 600 && !buf.containsKey(id); i++) {
                     Thread.sleep(100);
                 }
                 if (buf.containsKey(id)) {
                     text = buf.get(id);
                     buf.remove(id);
-                    tries = 0;
-                    break;
                 }
             } catch (Throwable th) {
                 th.printStackTrace();
-                Thread.sleep(1000);
             }
-            tries++;
-        }
-        if (tries > 0) {
-            throw new RuntimeException("Unable to process chat message from " + player.getName() + " make sure you have installed FreeBungeeChat on " + (player.getServer() != null ? player.getServer().getInfo().getName() : "(unknown server)"));
         }
         text = text.replace("%" + prefix + "server%", plugin.wrapVariable(player.getServer() != null ? player.getServer().getInfo().getName() : "unknown"));
         text = text.replace("%" + prefix + "BungeePerms_Prefix%", plugin.wrapVariable(getBungeePermsPrefix(player)));
