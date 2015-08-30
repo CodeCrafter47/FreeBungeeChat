@@ -246,7 +246,7 @@ public class FreeBungeeChatBukkit extends JavaPlugin implements Listener {
     @SneakyThrows
     public void processChatMessage(Player player, String text, String prefix, int id, boolean allowBBCode) {
         for (Variable variable : variables) {
-            Matcher matcher = Pattern.compile(String.format("%%%s%s%%", prefix, variable.getName())).matcher(text);
+            Matcher matcher = Pattern.compile(String.format("(?is)%%%s%s%%", prefix, variable.getName())).matcher(text);
             StringBuffer stringBuffer = new StringBuffer();
             while (matcher.find()) {
                 matcher.appendReplacement(stringBuffer, Matcher.quoteReplacement(wrapVariable(variable.getReplacement(player), allowBBCode)));

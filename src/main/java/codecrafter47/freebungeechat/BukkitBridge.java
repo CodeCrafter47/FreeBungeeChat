@@ -110,7 +110,7 @@ public class BukkitBridge implements Listener {
 
     @SneakyThrows
     public String replaceVariables(ProxiedPlayer player, String text, String prefix) {
-        if (text.matches("^.*%" + prefix + "(group|prefix(color)?|suffix|balance|currency|currencyPl|tabName|displayName|world|health|level|faction)%.*$")) {
+        if (text.matches("(?is).*%" + prefix + "(group|prefix(color)?|suffix|balance|currency|currencyPl|tabName|displayName|world|health|level|faction)%.*")) {
             try {
                 int id = getId();
                 if (buf.containsKey(id)) buf.remove(id);
