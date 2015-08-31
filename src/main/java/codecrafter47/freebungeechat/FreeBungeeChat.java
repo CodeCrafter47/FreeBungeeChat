@@ -16,11 +16,12 @@
  */
 package codecrafter47.freebungeechat;
 
-import codecrafter47.util.chat.BBCodeChatParser;
-import codecrafter47.util.chat.ChatParser;
 import codecrafter47.freebungeechat.bukkit.Constants;
 import codecrafter47.freebungeechat.commands.*;
 import codecrafter47.freebungeechat.extensions.Extension;
+import codecrafter47.freebungeechat.util.CustomClassLoaderYamlConfiguration;
+import codecrafter47.util.chat.BBCodeChatParser;
+import codecrafter47.util.chat.ChatParser;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
@@ -37,8 +38,6 @@ import net.md_5.bungee.api.event.TabCompleteEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.config.Configuration;
-import net.md_5.bungee.config.ConfigurationProvider;
-import codecrafter47.freebungeechat.util.CustomClassLoaderYamlConfiguration;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
 
@@ -255,7 +254,7 @@ public class FreeBungeeChat extends Plugin implements Listener {
             }
 
             // replace variables
-            String text = config.getString("chatFormat").replace("%player%",
+            String text = getChatFormat(player).replace("%player%",
                     wrapVariable(player.getDisplayName()));
             text = bukkitBridge.replaceVariables(player, text, "");
             text = text.replace("%message%", message);
@@ -289,7 +288,7 @@ public class FreeBungeeChat extends Plugin implements Listener {
             message = applyTagLogic(message);
 
             // replace variables
-            String text = config.getString("chatFormat").replace("%player%",
+            String text = getChatFormat(null).replace("%player%",
                     config.getString("consoleName", "SERVER"));
             text = text.replaceAll("%(server|group|prefix(color)?|suffix|balance|currency|currencyPl|tabName|displayName|world|health|level|BungeePerms_(Prefix|Suffix|Group))%", "");
             text = text.replace("%message%", message);
@@ -308,6 +307,20 @@ public class FreeBungeeChat extends Plugin implements Listener {
         } catch (Throwable th) {
             getLogger().log(Level.SEVERE, "Error while processing chat message", th);
         }
+    }
+
+    private String getChatFormat(ProxiedPlayer player) {
+        String globalChatFormat = config.getString("chatFormat");
+        String serverChatFormat = null;
+        Server server = player.getServer();
+        if (server != null) {
+            String serverName = server.getInfo().getName();
+            serverChatFormat = config.getSection("serverChatFormat").getString(serverName);
+        }
+        if (serverChatFormat != null) {
+            return serverChatFormat;
+        }
+        return globalChatFormat;
     }
 
     @EventHandler

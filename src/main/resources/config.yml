@@ -4,6 +4,12 @@
 # you can use %player%
 chatFormat: "&b[suggest=/w %player% ][hover=&7Message&r %player%]%player%[/hover][/suggest] &f> %message%"
 
+# server specific chat format
+# will be used for chat messages of players connected to the server
+# don't confuse with local chat
+serverChatFormat:
+  factionServer: "[%faction%]&b[suggest=/w %player% ][hover=&7Message&r %player%]%player%[/hover][/suggest] &f> %message%"
+
 # you can use %target%
 unknownTarget: "&c%target% is not on the server"
 
