@@ -40,6 +40,7 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.sk89q:jchronic:0.2.4a" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: net.milkbowl.vault:Vault:1.2.32" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: net.ess3:Essentials:2.13.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: codecrafter47.awesomemod:AwesomeMod:1.0-SNAPSHOT" level="project" />
   </component>
   <component name="org.twodividedbyzero.idea.findbugs">
     <option name="_basePreferences">

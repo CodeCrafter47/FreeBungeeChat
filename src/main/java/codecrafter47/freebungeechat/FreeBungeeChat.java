@@ -316,6 +316,9 @@ public class FreeBungeeChat extends Plugin implements Listener {
         if (server != null) {
             String serverName = server.getInfo().getName();
             serverChatFormat = config.getSection("serverChatFormat").getString(serverName);
+            if(serverChatFormat != null && serverChatFormat.isEmpty()){
+                serverChatFormat = null;
+            }
         }
         if (serverChatFormat != null) {
             return serverChatFormat;
