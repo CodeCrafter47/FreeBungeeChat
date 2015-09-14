@@ -99,7 +99,7 @@ public class FreeBungeeChatBukkit extends JavaPlugin implements Listener {
     private void registerVariables(){
         List<Variable> newVariables = new ArrayList<>();
 
-        final PlayerDataAggregator playerData = new PlayerDataAggregator(getLogger());
+        final PlayerDataAggregator playerData = new PlayerDataAggregator(this);
         Set<? extends Value<?>> availablePlayerData = playerData.getAvailableValueTypes();
         if(availablePlayerData.contains(Values.Player.Vault.Prefix)){
             newVariables.add(new Variable("prefix") {
