@@ -312,12 +312,14 @@ public class FreeBungeeChat extends Plugin implements Listener {
     private String getChatFormat(ProxiedPlayer player) {
         String globalChatFormat = config.getString("chatFormat");
         String serverChatFormat = null;
-        Server server = player.getServer();
-        if (server != null) {
-            String serverName = server.getInfo().getName();
-            serverChatFormat = config.getSection("serverChatFormat").getString(serverName);
-            if(serverChatFormat != null && serverChatFormat.isEmpty()){
-                serverChatFormat = null;
+        if (player != null) {
+            Server server = player.getServer();
+            if (server != null) {
+                String serverName = server.getInfo().getName();
+                serverChatFormat = config.getSection("serverChatFormat").getString(serverName);
+                if (serverChatFormat != null && serverChatFormat.isEmpty()) {
+                    serverChatFormat = null;
+                }
             }
         }
         if (serverChatFormat != null) {
