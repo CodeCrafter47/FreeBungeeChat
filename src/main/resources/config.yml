@@ -49,7 +49,7 @@ consoleName: "SERVER"
 # you can add custom regular expressions here
 regex:
 # make any pasted links clickable for convenience
-    - search: '(?<link>(?:(https?)://)?([-\w_\.]{2,}\.[a-z]{2,4})(/\S*)?)'
+    - search: '(?<link>(?:(https?)://)?([-\w_\.]{2,}\.[a-z]{2,8})(/\S*)?)'
       replace: "[url]${link}[/url]"
 # shows link target in tooltip for security reasons (only if link target differs from shown text)
     - search: '(?i)\[(?:url|command)=(?<cmd>(?:(?:[^]\[]*)\[(?:[^]\[]*)\])*(?:[^]\[]*))\]'
