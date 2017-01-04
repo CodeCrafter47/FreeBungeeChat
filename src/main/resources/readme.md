@@ -31,7 +31,7 @@ The difference between the above and making something &lbold&r the vanilla way i
 text bold, while &l makes bold everything until reaching the next color code.
 Same for [color=...]
 
-How links will work is easy to guess, e.g. it's just [url]spigotmc.org[/url] or [url=click here]spigotmc.org[/url].
+How links will work is easy to guess, e.g. it's just [url]spigotmc.org[/url] or [url=spigotmc.org]click here[/url].
 Executing commands works similar [command=/tp CodeCrafter47]click here[/command].
 
 Suggesting commands works with [suggest=/tp ]...[/suggest]
