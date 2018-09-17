@@ -21,7 +21,7 @@ package codecrafter47.freebungeechat.bukkit;
  */
 public class Constants {
 
-    public final static String channel = "codecrafter47:freebungeechat";
+    public final static String channel = "codecrafter47:fbc";
 
     public final static String subchannel_init = "init";
 
